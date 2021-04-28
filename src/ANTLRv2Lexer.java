@@ -1,4 +1,4 @@
-// Generated from /Users/gerardoarturomiranda/Documents/Diseño de Compiladores/ProyectoFinal_Compiladores/src/Grammar.g4 by ANTLR 4.9.1
+// Generated from /Users/gerardoarturomiranda/Documents/Diseño de Compiladores/ProyectoFinal_Compiladores/src/ANTLRv2Lexer.g4 by ANTLR 4.9.1
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
@@ -9,7 +9,7 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public class Grammar extends LexerAdaptor {
+public class ANTLRv2Lexer extends LexerAdaptor {
 	static { RuntimeMetaData.checkVersion("4.9.1", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
@@ -148,13 +148,13 @@ public class Grammar extends LexerAdaptor {
 	}
 
 
-	public Grammar(CharStream input) {
+	public ANTLRv2Lexer(CharStream input) {
 		super(input);
 		_interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 
 	@Override
-	public String getGrammarFileName() { return "Grammar.g4"; }
+	public String getGrammarFileName() { return "ANTLRv2Lexer.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
