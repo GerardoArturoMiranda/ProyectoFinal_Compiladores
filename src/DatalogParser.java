@@ -1,4 +1,4 @@
-// Generated from /Users/gerardoarturomiranda/Documents/Diseño de Compiladores/ProyectoFinal_Compiladores/src/Datalog.g4 by ANTLR 4.9.1
+// Generated from /Users/manuelortiz/Mac Documents/Tec/8vo ZoomSemestre/Diseño de Compiladores/Proyecto Final/ProyectoFinal_Compiladores/src/Datalog.g4 by ANTLR 4.9.1
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -17,9 +17,9 @@ public class DatalogParser extends Parser {
 		new PredictionContextCache();
 	public static final int
 		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, NOT=9, 
-		COUNT=10, AVG=11, SUM=12, MIN=13, MAX=14, IntegerLiteral=15, FloatingPointLiteral=16, 
-		BooleanLiteral=17, CharacterLiteral=18, StringLiteral=19, Predicate=20, 
-		Identifier=21, WS=22, COMMENT=23, MULTILINE_COMMENT=24;
+		COUNT=10, AVG=11, SUM=12, MIN=13, MAX=14, INTEGERLITERAL=15, FLOATINGPOINTLITERAL=16, 
+		BOOLEANLITERAL=17, CHARACTERLITERAL=18, STRINGLITERAL=19, PREDICATE=20, 
+		IDENTIFIER=21, WS=22, COMMENT=23, MULTILINE_COMMENT=24;
 	public static final int
 		RULE_program = 0, RULE_fact = 1, RULE_literalList = 2, RULE_facts = 3, 
 		RULE_rule = 4, RULE_rules = 5, RULE_query = 6, RULE_atom = 7, RULE_atoms = 8, 
@@ -44,8 +44,8 @@ public class DatalogParser extends Parser {
 	private static String[] makeSymbolicNames() {
 		return new String[] {
 			null, null, null, null, null, null, null, null, null, "NOT", "COUNT", 
-			"AVG", "SUM", "MIN", "MAX", "IntegerLiteral", "FloatingPointLiteral", 
-			"BooleanLiteral", "CharacterLiteral", "StringLiteral", "Predicate", "Identifier", 
+			"AVG", "SUM", "MIN", "MAX", "INTEGERLITERAL", "FLOATINGPOINTLITERAL", 
+			"BOOLEANLITERAL", "CHARACTERLITERAL", "STRINGLITERAL", "PREDICATE", "IDENTIFIER", 
 			"WS", "COMMENT", "MULTILINE_COMMENT"
 		};
 	}
@@ -160,7 +160,7 @@ public class DatalogParser extends Parser {
 				setState(37);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				if (_la==NOT || _la==Predicate) {
+				if (_la==NOT || _la==PREDICATE) {
 					{
 					setState(36);
 					rules();
@@ -468,7 +468,7 @@ public class DatalogParser extends Parser {
 				setState(69); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-			} while ( _la==NOT || _la==Predicate );
+			} while ( _la==NOT || _la==PREDICATE );
 			}
 		}
 		catch (RecognitionException re) {
@@ -565,7 +565,7 @@ public class DatalogParser extends Parser {
 			setState(81);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case Predicate:
+			case PREDICATE:
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(74);
@@ -702,18 +702,18 @@ public class DatalogParser extends Parser {
 			setState(94);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case Identifier:
+			case IDENTIFIER:
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(91);
 				variable();
 				}
 				break;
-			case IntegerLiteral:
-			case FloatingPointLiteral:
-			case BooleanLiteral:
-			case CharacterLiteral:
-			case StringLiteral:
+			case INTEGERLITERAL:
+			case FLOATINGPOINTLITERAL:
+			case BOOLEANLITERAL:
+			case CHARACTERLITERAL:
+			case STRINGLITERAL:
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(92);
@@ -919,7 +919,7 @@ public class DatalogParser extends Parser {
 	}
 
 	public static class VariableContext extends ParserRuleContext {
-		public TerminalNode Identifier() { return getToken(DatalogParser.Identifier, 0); }
+		public TerminalNode IDENTIFIER() { return getToken(DatalogParser.IDENTIFIER, 0); }
 		public VariableContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -946,7 +946,7 @@ public class DatalogParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(111);
-			match(Identifier);
+			match(IDENTIFIER);
 			}
 		}
 		catch (RecognitionException re) {
@@ -961,7 +961,7 @@ public class DatalogParser extends Parser {
 	}
 
 	public static class PredicateContext extends ParserRuleContext {
-		public TerminalNode Predicate() { return getToken(DatalogParser.Predicate, 0); }
+		public TerminalNode PREDICATE() { return getToken(DatalogParser.PREDICATE, 0); }
 		public PredicateContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -988,7 +988,7 @@ public class DatalogParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(113);
-			match(Predicate);
+			match(PREDICATE);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1003,11 +1003,11 @@ public class DatalogParser extends Parser {
 	}
 
 	public static class LiteralContext extends ParserRuleContext {
-		public TerminalNode IntegerLiteral() { return getToken(DatalogParser.IntegerLiteral, 0); }
-		public TerminalNode FloatingPointLiteral() { return getToken(DatalogParser.FloatingPointLiteral, 0); }
-		public TerminalNode BooleanLiteral() { return getToken(DatalogParser.BooleanLiteral, 0); }
-		public TerminalNode CharacterLiteral() { return getToken(DatalogParser.CharacterLiteral, 0); }
-		public TerminalNode StringLiteral() { return getToken(DatalogParser.StringLiteral, 0); }
+		public TerminalNode INTEGERLITERAL() { return getToken(DatalogParser.INTEGERLITERAL, 0); }
+		public TerminalNode FLOATINGPOINTLITERAL() { return getToken(DatalogParser.FLOATINGPOINTLITERAL, 0); }
+		public TerminalNode BOOLEANLITERAL() { return getToken(DatalogParser.BOOLEANLITERAL, 0); }
+		public TerminalNode CHARACTERLITERAL() { return getToken(DatalogParser.CHARACTERLITERAL, 0); }
+		public TerminalNode STRINGLITERAL() { return getToken(DatalogParser.STRINGLITERAL, 0); }
 		public LiteralContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -1036,7 +1036,7 @@ public class DatalogParser extends Parser {
 			{
 			setState(115);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << IntegerLiteral) | (1L << FloatingPointLiteral) | (1L << BooleanLiteral) | (1L << CharacterLiteral) | (1L << StringLiteral))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << INTEGERLITERAL) | (1L << FLOATINGPOINTLITERAL) | (1L << BOOLEANLITERAL) | (1L << CHARACTERLITERAL) | (1L << STRINGLITERAL))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {

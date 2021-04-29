@@ -1,4 +1,4 @@
-// Generated from /Users/gerardoarturomiranda/Documents/Diseño de Compiladores/ProyectoFinal_Compiladores/src/Datalog.g4 by ANTLR 4.9.1
+// Generated from /Users/manuelortiz/Mac Documents/Tec/8vo ZoomSemestre/Diseño de Compiladores/Proyecto Final/ProyectoFinal_Compiladores/src/Datalog.g4 by ANTLR 4.9.1
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
@@ -17,9 +17,9 @@ public class DatalogLexer extends Lexer {
 		new PredictionContextCache();
 	public static final int
 		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, NOT=9, 
-		COUNT=10, AVG=11, SUM=12, MIN=13, MAX=14, IntegerLiteral=15, FloatingPointLiteral=16, 
-		BooleanLiteral=17, CharacterLiteral=18, StringLiteral=19, Predicate=20, 
-		Identifier=21, WS=22, COMMENT=23, MULTILINE_COMMENT=24;
+		COUNT=10, AVG=11, SUM=12, MIN=13, MAX=14, INTEGERLITERAL=15, FLOATINGPOINTLITERAL=16, 
+		BOOLEANLITERAL=17, CHARACTERLITERAL=18, STRINGLITERAL=19, PREDICATE=20, 
+		IDENTIFIER=21, WS=22, COMMENT=23, MULTILINE_COMMENT=24;
 	public static String[] channelNames = {
 		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"
 	};
@@ -31,20 +31,20 @@ public class DatalogLexer extends Lexer {
 	private static String[] makeRuleNames() {
 		return new String[] {
 			"T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", "T__7", "NOT", 
-			"COUNT", "AVG", "SUM", "MIN", "MAX", "IntegerLiteral", "DecimalIntegerLiteral", 
-			"HexIntegerLiteral", "OctalIntegerLiteral", "BinaryIntegerLiteral", "IntegerTypeSuffix", 
-			"DecimalNumeral", "Digits", "Digit", "NonZeroDigit", "DigitsAndUnderscores", 
-			"DigitOrUnderscore", "Underscores", "HexNumeral", "HexDigits", "HexDigit", 
-			"HexDigitsAndUnderscores", "HexDigitOrUnderscore", "OctalNumeral", "OctalDigits", 
-			"OctalDigit", "OctalDigitsAndUnderscores", "OctalDigitOrUnderscore", 
-			"BinaryNumeral", "BinaryDigits", "BinaryDigit", "BinaryDigitsAndUnderscores", 
-			"BinaryDigitOrUnderscore", "FloatingPointLiteral", "DecimalFloatingPointLiteral", 
-			"ExponentPart", "ExponentIndicator", "SignedInteger", "Sign", "FloatTypeSuffix", 
-			"HexadecimalFloatingPointLiteral", "HexSignificand", "BinaryExponent", 
-			"BinaryExponentIndicator", "BooleanLiteral", "CharacterLiteral", "SingleCharacter", 
-			"StringLiteral", "StringCharacters", "StringCharacter", "EscapeSequence", 
-			"OctalEscape", "ZeroToThree", "Predicate", "Identifier", "IdentifierLetter", 
-			"IdentifierLetterOrDigit", "WS", "COMMENT", "MULTILINE_COMMENT"
+			"COUNT", "AVG", "SUM", "MIN", "MAX", "INTEGERLITERAL", "DECIMALINTEGERLITERAL", 
+			"HEXINTEGERLITERAL", "OCTALINTEGERLITERAL", "BINARYINTEGERLITERAL", "INTEGERTYPESUFFIX", 
+			"DECIMALNUMERAL", "DIGITS", "DIGIT", "NONZERODIGIT", "DIGITSANDUNDERSCORES", 
+			"DIGITORUNDERSCORE", "UNDERSCORES", "HEXNUMERAL", "HEXDIGITS", "HEXDIGIT", 
+			"HEXDIGITSANDUNDERSCORES", "HEXDIGITORUNDERSCORE", "OCTALNUMERAL", "OCTALDIGITS", 
+			"OCTALDIGIT", "OCTALDIGITSANDUNDERSCORES", "OCTALDIGITORUNDERSCORE", 
+			"BINARYNUMERAL", "BINARYDIGITS", "BINARYDIGIT", "BINARYDIGITSANDUNDERSCORES", 
+			"BINARYDIGITORUNDERSCORE", "FLOATINGPOINTLITERAL", "DECIMALFLOATINGPOINTLITERAL", 
+			"EXPONENTPART", "EXPONENTINDICATOR", "SIGNEDINTEGER", "SIGN", "FLOATTYPESUFFIX", 
+			"HEXADECIMALFLOATINGPOINTLITERAL", "HEXSIGNIFICAND", "BINARYEXPONENT", 
+			"BINARYEXPONENTINDICATOR", "BOOLEANLITERAL", "CHARACTERLITERAL", "SINGLECHARACTER", 
+			"STRINGLITERAL", "STRINGCHARACTERS", "STRINGCHARACTER", "ESCAPESEQUENCE", 
+			"OCTALESCAPE", "ZEROTOTHREE", "PREDICATE", "IDENTIFIER", "IDENTIFIERLETTER", 
+			"IDENTIFIERLETTERORDIGIT", "WS", "COMMENT", "MULTILINE_COMMENT"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
@@ -59,8 +59,8 @@ public class DatalogLexer extends Lexer {
 	private static String[] makeSymbolicNames() {
 		return new String[] {
 			null, null, null, null, null, null, null, null, null, "NOT", "COUNT", 
-			"AVG", "SUM", "MIN", "MAX", "IntegerLiteral", "FloatingPointLiteral", 
-			"BooleanLiteral", "CharacterLiteral", "StringLiteral", "Predicate", "Identifier", 
+			"AVG", "SUM", "MIN", "MAX", "INTEGERLITERAL", "FLOATINGPOINTLITERAL", 
+			"BOOLEANLITERAL", "CHARACTERLITERAL", "STRINGLITERAL", "PREDICATE", "IDENTIFIER", 
 			"WS", "COMMENT", "MULTILINE_COMMENT"
 		};
 	}

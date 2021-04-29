@@ -82,19 +82,19 @@ aggregateOp
     ;
 
 variable
-    : Identifier
+    : IDENTIFIER
     ;
 
 predicate
-    : Predicate
+    : PREDICATE
     ;
 
 literal
-	:	IntegerLiteral
-	|	FloatingPointLiteral
-	|	BooleanLiteral
-	|	CharacterLiteral
-	|	StringLiteral
+	:	INTEGERLITERAL
+	|	FLOATINGPOINTLITERAL
+	|	BOOLEANLITERAL
+	|	CHARACTERLITERAL
+	|	STRINGLITERAL
 	;
 
 // Lexer rules
@@ -112,220 +112,220 @@ MAX: 'max';
 //
 // Integers
 //
-IntegerLiteral
-	:	DecimalIntegerLiteral
-	|	HexIntegerLiteral
-	|	OctalIntegerLiteral
-	|	BinaryIntegerLiteral
+INTEGERLITERAL
+	:	DECIMALINTEGERLITERAL
+	|	HEXINTEGERLITERAL
+	|	OCTALINTEGERLITERAL
+	|	BINARYINTEGERLITERAL
 	;
 
 fragment
-DecimalIntegerLiteral
-	:	DecimalNumeral IntegerTypeSuffix?
+DECIMALINTEGERLITERAL
+	:	DECIMALNUMERAL INTEGERTYPESUFFIX?
 	;
 
 fragment
-HexIntegerLiteral
-	:	HexNumeral IntegerTypeSuffix?
+HEXINTEGERLITERAL
+	:	HEXNUMERAL INTEGERTYPESUFFIX?
 	;
 
 fragment
-OctalIntegerLiteral
-	:	OctalNumeral IntegerTypeSuffix?
+OCTALINTEGERLITERAL
+	:	OCTALNUMERAL INTEGERTYPESUFFIX?
 	;
 
 fragment
-BinaryIntegerLiteral
-	:	BinaryNumeral IntegerTypeSuffix?
+BINARYINTEGERLITERAL
+	:	BINARYNUMERAL INTEGERTYPESUFFIX?
 	;
 
 fragment
-IntegerTypeSuffix
+INTEGERTYPESUFFIX
 	:	[lL]
 	;
 
 fragment
-DecimalNumeral
+DECIMALNUMERAL
 	:	'0'
-	|	NonZeroDigit (Digits? | Underscores Digits)
+	|	NONZERODIGIT (DIGITS? | UNDERSCORES DIGITS)
 	;
 
 fragment
-Digits
-	:	Digit (DigitsAndUnderscores? Digit)?
+DIGITS
+	:	DIGIT (DIGITSANDUNDERSCORES? DIGIT)?
 	;
 
 fragment
-Digit
+DIGIT
 	:	'0'
-	|	NonZeroDigit
+	|	NONZERODIGIT
 	;
 
 fragment
-NonZeroDigit
+NONZERODIGIT
 	:	[1-9]
 	;
 
 fragment
-DigitsAndUnderscores
-	:	DigitOrUnderscore+
+DIGITSANDUNDERSCORES
+	:	DIGITORUNDERSCORE+
 	;
 
 fragment
-DigitOrUnderscore
-	:	Digit
+DIGITORUNDERSCORE
+	:	DIGIT
 	|	'_'
 	;
 
 fragment
-Underscores
+UNDERSCORES
 	:	'_'+
 	;
 
 fragment
-HexNumeral
-	:	'0' [xX] HexDigits
+HEXNUMERAL
+	:	'0' [xX] HEXDIGITS
 	;
 
 fragment
-HexDigits
-	:	HexDigit (HexDigitsAndUnderscores? HexDigit)?
+HEXDIGITS
+	:	HEXDIGIT (HEXDIGITSANDUNDERSCORES? HEXDIGIT)?
 	;
 
 fragment
-HexDigit
+HEXDIGIT
 	:	[0-9a-fA-F]
 	;
 
 fragment
-HexDigitsAndUnderscores
-	:	HexDigitOrUnderscore+
+HEXDIGITSANDUNDERSCORES
+	:	HEXDIGITORUNDERSCORE+
 	;
 
 fragment
-HexDigitOrUnderscore
-	:	HexDigit
+HEXDIGITORUNDERSCORE
+	:	HEXDIGIT
 	|	'_'
 	;
 
 fragment
-OctalNumeral
-	:	'0' Underscores? OctalDigits
+OCTALNUMERAL
+	:	'0' UNDERSCORES? OCTALDIGITS
 	;
 
 fragment
-OctalDigits
-	:	OctalDigit (OctalDigitsAndUnderscores? OctalDigit)?
+OCTALDIGITS
+	:	OCTALDIGIT (OCTALDIGITSANDUNDERSCORES? OCTALDIGIT)?
 	;
 
 fragment
-OctalDigit
+OCTALDIGIT
 	:	[0-7]
 	;
 
 fragment
-OctalDigitsAndUnderscores
-	:	OctalDigitOrUnderscore+
+OCTALDIGITSANDUNDERSCORES
+	:	OCTALDIGITORUNDERSCORE+
 	;
 
 fragment
-OctalDigitOrUnderscore
-	:	OctalDigit
+OCTALDIGITORUNDERSCORE
+	:	OCTALDIGIT
 	|	'_'
 	;
 
 fragment
-BinaryNumeral
-	:	'0' [bB] BinaryDigits
+BINARYNUMERAL
+	:	'0' [bB] BINARYDIGITS
 	;
 
 fragment
-BinaryDigits
-	:	BinaryDigit (BinaryDigitsAndUnderscores? BinaryDigit)?
+BINARYDIGITS
+	:	BINARYDIGIT (BINARYDIGITSANDUNDERSCORES? BINARYDIGIT)?
 	;
 
 fragment
-BinaryDigit
+BINARYDIGIT
 	:	[01]
 	;
 
 fragment
-BinaryDigitsAndUnderscores
-	:	BinaryDigitOrUnderscore+
+BINARYDIGITSANDUNDERSCORES
+	:	BINARYDIGITORUNDERSCORE+
 	;
 
 fragment
-BinaryDigitOrUnderscore
-	:	BinaryDigit
+BINARYDIGITORUNDERSCORE
+	:	BINARYDIGIT
 	|	'_'
 	;
 
 //
 // Floating point numbers
 //
-FloatingPointLiteral
-	:	DecimalFloatingPointLiteral
-	|	HexadecimalFloatingPointLiteral
+FLOATINGPOINTLITERAL
+	:	DECIMALFLOATINGPOINTLITERAL
+	|	HEXADECIMALFLOATINGPOINTLITERAL
 	;
 
 fragment
-DecimalFloatingPointLiteral
-	:	Digits '.' Digits? ExponentPart? FloatTypeSuffix?
-	|	'.' Digits ExponentPart? FloatTypeSuffix?
-	|	Digits ExponentPart FloatTypeSuffix?
-	|	Digits FloatTypeSuffix
+DECIMALFLOATINGPOINTLITERAL
+	:	DIGITS '.' DIGITS? EXPONENTPART? FLOATTYPESUFFIX?
+	|	'.' DIGITS EXPONENTPART? FLOATTYPESUFFIX?
+	|	DIGITS EXPONENTPART FLOATTYPESUFFIX?
+	|	DIGITS FLOATTYPESUFFIX
 	;
 
 fragment
-ExponentPart
-	:	ExponentIndicator SignedInteger
+EXPONENTPART
+	:	EXPONENTINDICATOR SIGNEDINTEGER
 	;
 
 fragment
-ExponentIndicator
+EXPONENTINDICATOR
 	:	[eE]
 	;
 
 fragment
-SignedInteger
-	:	Sign? Digits
+SIGNEDINTEGER
+	:	SIGN? DIGITS
 	;
 
 fragment
-Sign
+SIGN
 	:	[+-]
 	;
 
 fragment
-FloatTypeSuffix
+FLOATTYPESUFFIX
 	:	[fFdD]
 	;
 
 fragment
-HexadecimalFloatingPointLiteral
-	:	HexSignificand BinaryExponent FloatTypeSuffix?
+HEXADECIMALFLOATINGPOINTLITERAL
+	:	HEXSIGNIFICAND BINARYEXPONENT FLOATTYPESUFFIX?
 	;
 
 fragment
-HexSignificand
-	:	HexNumeral '.'?
-	|	'0' [xX] HexDigits? '.' HexDigits
+HEXSIGNIFICAND
+	:	HEXNUMERAL '.'?
+	|	'0' [xX] HEXDIGITS? '.' HEXDIGITS
 	;
 
 fragment
-BinaryExponent
-	:	BinaryExponentIndicator SignedInteger
+BINARYEXPONENT
+	:	BINARYEXPONENTINDICATOR SIGNEDINTEGER
 	;
 
 fragment
-BinaryExponentIndicator
+BINARYEXPONENTINDICATOR
 	:	[pP]
 	;
 
 //
 // Boolean
 //
-BooleanLiteral
+BOOLEANLITERAL
 	:	'true'
 	|	'false'
 	;
@@ -333,67 +333,67 @@ BooleanLiteral
 //
 // Characters
 //
-CharacterLiteral
-	:	'\'' SingleCharacter '\''
-	|	'\'' EscapeSequence '\''
+CHARACTERLITERAL
+	:	'\'' SINGLECHARACTER '\''
+	|	'\'' ESCAPESEQUENCE '\''
 	;
 
 fragment
-SingleCharacter
+SINGLECHARACTER
 	:	~['\\\r\n]
 	;
 //
 // Strings
 //
-StringLiteral
-	:	'"' StringCharacters? '"'
+STRINGLITERAL
+	:	'"' STRINGCHARACTERS? '"'
 	;
 fragment
-StringCharacters
-	:	StringCharacter+
+STRINGCHARACTERS
+	:	STRINGCHARACTER+
 	;
 fragment
-StringCharacter
+STRINGCHARACTER
 	:	~["\\\r\n]
-	|	EscapeSequence
+	|	ESCAPESEQUENCE
 	;
 // §3.10.6 Escape Sequences for Character and String Literals
 fragment
-EscapeSequence
+ESCAPESEQUENCE
 	:	'\\' [btnfr"'\\]
-	|	OctalEscape
+	|	OCTALESCAPE
 	;
 
 fragment
-OctalEscape
-	:	'\\' OctalDigit
-	|	'\\' OctalDigit OctalDigit
-	|	'\\' ZeroToThree OctalDigit OctalDigit
+OCTALESCAPE
+	:	'\\' OCTALDIGIT
+	|	'\\' OCTALDIGIT OCTALDIGIT
+	|	'\\' ZEROTOTHREE OCTALDIGIT OCTALDIGIT
 	;
 
 fragment
-ZeroToThree
+ZEROTOTHREE
 	:	[0-3]
 	;
 
 //
 // Identifiers & Predicates
 //
-Predicate
-    : IdentifierLetter IdentifierLetterOrDigit*
+PREDICATE
+    : IDENTIFIERLETTER IDENTIFIERLETTERORDIGIT*
     ;
 
-Identifier
-    : '?' IdentifierLetter IdentifierLetterOrDigit*
+IDENTIFIER
+    : '?' IDENTIFIERLETTER IDENTIFIERLETTERORDIGIT*
     ;
 
 fragment
-IdentifierLetter
+IDENTIFIERLETTER
     : [a-zA-Z]
     ;
 
 fragment
-IdentifierLetterOrDigit
+IDENTIFIERLETTERORDIGIT
     : [a-zA-Z0-9_]
     ;
 
