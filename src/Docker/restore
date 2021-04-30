@@ -1,0 +1,5 @@
+#!/bin/bash
+/dump/restore1 &
+/opt/mssql/bin/sqlservr
+
+
