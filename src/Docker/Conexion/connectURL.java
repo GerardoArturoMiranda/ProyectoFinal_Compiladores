@@ -27,13 +27,60 @@ import java.sql.*;
 import java.io.File;  
 import java.io.FileNotFoundException;
 import java.util.*;
+import Pojos.MetaData;
 
 public class connectURL {
 
-	public void query(String SQL) { }
+	public void query(String SQL) {
+		// Create a variable for the connection string.
+		String connectionUrl = "jdbc:sqlserver://localhost:1433;" +
+				"databaseName=AdventureWorks;integratedSecurity=false;";
 
-	public Hashtable<String, ArrayList<String>> getMetaData() {
-		Hashtable<String, ArrayList<String>> metaData = new Hashtable<>();
+		// Declare the JDBC objects.
+		Connection con = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		ResultSetMetaData rsmd;
+
+		try {
+			// Establish the connection.
+			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+			con = DriverManager.getConnection(connectionUrl,"sa","Compiladores@2021");
+
+			// Create and execute an SQL statement that returns some data.
+			// String SQL = leeArchivo(args[0]);
+
+			// Get metadata
+			stmt = con.createStatement();
+			rs = stmt.executeQuery(SQL);
+			rsmd = rs.getMetaData();
+			for(int i = 1; i <= rsmd.getColumnCount(); i++) {
+				System.out.printf("%40s", rsmd.getColumnLabel(i));
+			}
+			System.out.println();
+			// Iterate through the data in the result set and display it.
+			while (rs.next()) {
+				for(int i = 1; i <= rsmd.getColumnCount(); i++) {
+					System.out.printf("%40s",rs.getString(i));
+				}
+				System.out.println();
+			}
+		}
+
+		// Handle any errors that may have occurred.
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			if (rs != null) try { rs.close(); } catch(Exception e) {}
+			if (stmt != null) try { stmt.close(); } catch(Exception e) {}
+			if (con != null) try { con.close(); } catch(Exception e) {}
+		}
+	}
+
+	public MetaData getMetaData() {
+		MetaData metaData = new MetaData();
 
 		// Create a variable for the connection string.
 		String connectionUrl = "jdbc:sqlserver://localhost:1433;" +
@@ -58,13 +105,15 @@ public class connectURL {
 
 			// Iterate through the data in the result set and display it.
 			while (rs.next()) {
+				String schemaName = rs.getString(2);
 				String tableName = rs.getString(3);
 				String columnName = rs.getString(4);
-				// If key, val pair don't exist, initialize them
-				if (!metaData.containsKey(tableName)) {
-					metaData.put(tableName, new ArrayList<>());
+				// If columns key, val pair don't exist, initialize them
+				if (!metaData.columns.containsKey(tableName)) {
+					metaData.columns.put(tableName, new ArrayList<>());
 				}
-				metaData.get(tableName).add(columnName);
+				metaData.columns.get(tableName).add(columnName);
+				metaData.schema.put(tableName, schemaName);
 			}
 		}
 
@@ -117,7 +166,7 @@ public class connectURL {
 			// String SQL = leeArchivo(args[0]);
 
 			// Get metadata
-			String SQL = "SELECT NationalIDNumber,ContactID FROM HumanResources.Employee WHERE EmployeeID=1";
+			String SQL = "SELECT * FROM Sales.SpecialOffer";
 			System.out.println(SQL);
 			stmt = con.createStatement();
 			rs = stmt.executeQuery(SQL);
