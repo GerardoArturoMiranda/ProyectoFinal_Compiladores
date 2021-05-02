@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+  mysqlserver:
+    build: .
+    ports:
+      - "1433:1433"
+    volumes:
+     - ./restore:/dump/restore
+     - ./restore1:/dump/restore1
+    command: bash -c "/dump/restore"
+    

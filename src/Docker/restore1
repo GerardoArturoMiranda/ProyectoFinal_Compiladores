@@ -1,0 +1,5 @@
+#!/bin/bash
+sleep 20
+echo "restaurando"
+/opt/mssql-tools/bin/sqlcmd    -S localhost -U SA -P 'Compiladores@2021'    -Q 'RESTORE DATABASE AdventureWorks FROM DISK = "/var/opt/mssql/backup/AdventureWorks.bak" WITH MOVE "AdventureWorks_Data" TO "/var/opt/mssql/data/AdventureWorks.mdf", MOVE "AdventureWorks_log" TO "/var/opt/mssql/data/AdventureWorks.ldf"'
+/opt/mssql-tools/bin/sqlcmd    -S localhost -U SA -P 'Compiladores@2021' -i "/var/opt/mssql/backup/escuela.sql" 
