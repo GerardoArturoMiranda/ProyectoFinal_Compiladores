@@ -1,21 +1,18 @@
 import Docker.Conexion.connectURL;
+import Pojos.MetaData;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Locale;
 
 public class DBConnector {
     private static connectURL con = new connectURL();
-    public static Hashtable<String, ArrayList<String>> metaData = new Hashtable<>();
+    public static MetaData metaData = new MetaData();
 
     public static void retrieveMetaData() {
         metaData = con.getMetaData();
     }
 
     public static void query(String tableName, String[] columnNames) {
-        if (!metaData.containsKey(tableName)) {
+        if (!metaData.columns.containsKey(tableName)) {
             System.out.println("El predicado " + tableName + " no existe en la base de datos.");
             return;
         }
@@ -29,7 +26,7 @@ public class DBConnector {
         for (int i = 0; i < columnNames.length; i++) {
             // Target columns start with ?
             if (columnNames[i].charAt(0) == '?') {
-                ArrayList<String> tableColumns = metaData.get(tableName);
+                ArrayList<String> tableColumns = metaData.columns.get(tableName);
                 String targetColumnName = tableColumns.get(i);
                 SQL.append(targetColumnName + ",");
             }
@@ -38,7 +35,7 @@ public class DBConnector {
         SQL.deleteCharAt(SQL.length() - 1);
 
         // Build FROM section
-        SQL.append(" FROM " + tableName + " ");
+        SQL.append(" FROM " + metaData.schema.get(tableName) + "." + tableName + " ");
 
         // Build WHERE section
         SQL.append("WHERE");
@@ -46,15 +43,15 @@ public class DBConnector {
         for (int i = 0; i < columnNames.length; i++) {
             // Target columns start with ?
             if (columnNames[i].charAt(0) != '?') {
-                ArrayList<String> tableColumns = metaData.get(tableName);
+                ArrayList<String> tableColumns = metaData.columns.get(tableName);
                 String targetColumnName = tableColumns.get(i);
-                SQL.append(" " + targetColumnName + "=" + columnNames[i] + " AND");
+                SQL.append(" " + targetColumnName + "='" + columnNames[i] + "' AND");
             }
         }
         // Remove trailing AND
         SQL.delete(SQL.length() - 4, SQL.length());
 
-        System.out.println(SQL.toString());
-        //con.query(SQL.toString());
+        System.out.println("QUERY: " + SQL.toString());
+        con.query(SQL.toString());
     }
 }

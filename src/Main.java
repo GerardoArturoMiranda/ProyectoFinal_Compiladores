@@ -6,10 +6,11 @@ public class Main {
         try {
             // Stores all table names with it's corresponding column names
             DBConnector.retrieveMetaData();
-            System.out.println(DBConnector.metaData);
+            System.out.println("COLUMNS: " + DBConnector.metaData.columns);
+            System.out.println("SCHEMAS: " + DBConnector.metaData.schema);
             // Example query
-            String tableName = "Employee";
-            String[] columnNames = {"1", "?x", "?y"};
+            String tableName = "SpecialOffer";
+            String[] columnNames = {"15", "?x", "?y", "?z"};
             DBConnector.query(tableName, columnNames);
 
             CharStream input = CharStreams.fromStream(System.in);
