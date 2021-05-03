@@ -1,4 +1,4 @@
-// Generated from /Users/manuelortiz/Mac Documents/Tec/8vo ZoomSemestre/Diseño de Compiladores/Proyecto Final/ProyectoFinal_Compiladores/src/Datalog.g4 by ANTLR 4.9.1
+// Generated from /Users/gerardoarturomiranda/Documents/Diseño de Compiladores/ProyectoFinal_Compiladores/src/Datalog.g4 by ANTLR 4.9.1
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -26,6 +26,16 @@ public interface DatalogListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFact(DatalogParser.FactContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DatalogParser#end}.
+	 * @param ctx the parse tree
+	 */
+	void enterEnd(DatalogParser.EndContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DatalogParser#end}.
+	 * @param ctx the parse tree
+	 */
+	void exitEnd(DatalogParser.EndContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link DatalogParser#literalList}.
 	 * @param ctx the parse tree

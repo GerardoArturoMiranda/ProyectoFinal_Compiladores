@@ -1,4 +1,4 @@
-// Generated from /Users/manuelortiz/Mac Documents/Tec/8vo ZoomSemestre/Diseño de Compiladores/Proyecto Final/ProyectoFinal_Compiladores/src/Datalog.g4 by ANTLR 4.9.1
+// Generated from /Users/gerardoarturomiranda/Documents/Diseño de Compiladores/ProyectoFinal_Compiladores/src/Datalog.g4 by ANTLR 4.9.1
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -34,6 +34,18 @@ public class DatalogBaseListener implements DatalogListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitFact(DatalogParser.FactContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterEnd(DatalogParser.EndContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitEnd(DatalogParser.EndContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -1,4 +1,4 @@
-// Generated from /Users/manuelortiz/Mac Documents/Tec/8vo ZoomSemestre/Diseño de Compiladores/Proyecto Final/ProyectoFinal_Compiladores/src/Datalog.g4 by ANTLR 4.9.1
+// Generated from /Users/gerardoarturomiranda/Documents/Diseño de Compiladores/ProyectoFinal_Compiladores/src/Datalog.g4 by ANTLR 4.9.1
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -21,6 +21,12 @@ public interface DatalogVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFact(DatalogParser.FactContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link DatalogParser#end}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEnd(DatalogParser.EndContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link DatalogParser#literalList}.
 	 * @param ctx the parse tree

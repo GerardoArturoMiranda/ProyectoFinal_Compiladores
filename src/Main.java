@@ -12,7 +12,6 @@ public class Main {
             String tableName = "SpecialOffer";
             String[] columnNames = {"15", "?x", "?y", "?z"};
             DBConnector.query(tableName, columnNames);
-
             CharStream input = CharStreams.fromStream(System.in);
             DatalogLexer lexer = new DatalogLexer(input);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
