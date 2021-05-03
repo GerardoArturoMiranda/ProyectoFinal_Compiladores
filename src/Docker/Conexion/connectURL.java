@@ -22,9 +22,8 @@ package Docker.Conexion;
 //  PARTICULAR PURPOSE.
 //
 //===================================================================== 
-
 import java.sql.*;
-import java.io.File;  
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 import Pojos.MetaData;
@@ -131,25 +130,25 @@ public class connectURL {
 		return metaData;
 	}
 
-    public static String leeArchivo(String archivo) {
-	StringBuilder sb = new StringBuilder();
-	try {
-	    File a = new File(archivo);
-	    Scanner sc = new Scanner(a);
-	    while (sc.hasNextLine()) {
-		sb.append(sc.nextLine() + "\n");
-	    }
-	    sc.close();
+	public static String leeArchivo(String archivo) {
+		StringBuilder sb = new StringBuilder();
+		try {
+			File a = new File(archivo);
+			Scanner sc = new Scanner(a);
+			while (sc.hasNextLine()) {
+				sb.append(sc.nextLine() + "\n");
+			}
+			sc.close();
+		}
+		catch(FileNotFoundException e) {
+		}
+		return sb.toString();
 	}
-	catch(FileNotFoundException e) {
-	}
-	return sb.toString();
-    }
-    
-    public static void main(String[] args) {
+
+	public static void main(String[] args) {
 		// Create a variable for the connection string.
 		String connectionUrl = "jdbc:sqlserver://localhost:1433;" +
-			"databaseName=AdventureWorks;integratedSecurity=false;";
+				"databaseName=AdventureWorks;integratedSecurity=false;";
 
 		// Declare the JDBC objects.
 		Connection con = null;
@@ -170,7 +169,7 @@ public class connectURL {
 			System.out.println(SQL);
 			stmt = con.createStatement();
 			rs = stmt.executeQuery(SQL);
-				rsmd = rs.getMetaData();
+			rsmd = rs.getMetaData();
 			for(int i = 1; i <= rsmd.getColumnCount(); i++) {
 				System.out.printf("%40s", rsmd.getColumnLabel(i));
 			}
@@ -188,12 +187,11 @@ public class connectURL {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-	
+
 		finally {
 			if (rs != null) try { rs.close(); } catch(Exception e) {}
 			if (stmt != null) try { stmt.close(); } catch(Exception e) {}
 			if (con != null) try { con.close(); } catch(Exception e) {}
 		}
-    }
+	}
 }
-
