@@ -27,16 +27,6 @@ public interface DatalogListener extends ParseTreeListener {
 	 */
 	void exitFact(DatalogParser.FactContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link DatalogParser#end}.
-	 * @param ctx the parse tree
-	 */
-	void enterEnd(DatalogParser.EndContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link DatalogParser#end}.
-	 * @param ctx the parse tree
-	 */
-	void exitEnd(DatalogParser.EndContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link DatalogParser#literalList}.
 	 * @param ctx the parse tree
 	 */
@@ -57,6 +47,16 @@ public interface DatalogListener extends ParseTreeListener {
 	 */
 	void exitFacts(DatalogParser.FactsContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link DatalogParser#condition}.
+	 * @param ctx the parse tree
+	 */
+	void enterCondition(DatalogParser.ConditionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DatalogParser#condition}.
+	 * @param ctx the parse tree
+	 */
+	void exitCondition(DatalogParser.ConditionContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link DatalogParser#rule}.
 	 * @param ctx the parse tree
 	 */
@@ -66,6 +66,16 @@ public interface DatalogListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitRule(DatalogParser.RuleContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DatalogParser#end}.
+	 * @param ctx the parse tree
+	 */
+	void enterEnd(DatalogParser.EndContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DatalogParser#end}.
+	 * @param ctx the parse tree
+	 */
+	void exitEnd(DatalogParser.EndContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link DatalogParser#rules}.
 	 * @param ctx the parse tree

@@ -41,12 +41,14 @@ public class DBConnector {
         SQL.append("WHERE");
         // Find target columns
         for (int i = 0; i < columnNames.length; i++) {
+
             // Target columns start with ?
             if (columnNames[i].charAt(0) != '?') {
                 ArrayList<String> tableColumns = metaData.columns.get(tableName);
                 String targetColumnName = tableColumns.get(i);
                 SQL.append(" " + targetColumnName + "='" + columnNames[i] + "' AND");
             }
+
         }
         // Remove trailing AND
         SQL.delete(SQL.length() - 4, SQL.length());

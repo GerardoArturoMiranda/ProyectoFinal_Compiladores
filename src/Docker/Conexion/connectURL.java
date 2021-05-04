@@ -54,12 +54,14 @@ public class connectURL {
 			rs = stmt.executeQuery(SQL);
 			rsmd = rs.getMetaData();
 			for(int i = 1; i <= rsmd.getColumnCount(); i++) {
+
 				System.out.printf("%40s", rsmd.getColumnLabel(i));
 			}
 			System.out.println();
 			// Iterate through the data in the result set and display it.
 			while (rs.next()) {
 				for(int i = 1; i <= rsmd.getColumnCount(); i++) {
+
 					System.out.printf("%40s",rs.getString(i));
 				}
 				System.out.println();
@@ -112,6 +114,7 @@ public class connectURL {
 					metaData.columns.put(tableName, new ArrayList<>());
 				}
 				metaData.columns.get(tableName).add(columnName);
+				metaData.columns.get(tableName).add("\n");
 				metaData.schema.put(tableName, schemaName);
 			}
 		}
@@ -144,7 +147,7 @@ public class connectURL {
 		}
 		return sb.toString();
 	}
-
+	
 	public static void main(String[] args) {
 		// Create a variable for the connection string.
 		String connectionUrl = "jdbc:sqlserver://localhost:1433;" +
