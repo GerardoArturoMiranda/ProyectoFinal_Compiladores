@@ -114,7 +114,6 @@ public class connectURL {
 					metaData.columns.put(tableName, new ArrayList<>());
 				}
 				metaData.columns.get(tableName).add(columnName);
-				metaData.columns.get(tableName).add("\n");
 				metaData.schema.put(tableName, schemaName);
 			}
 		}
