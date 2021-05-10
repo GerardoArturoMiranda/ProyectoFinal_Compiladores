@@ -22,12 +22,6 @@ public interface DatalogVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFact(DatalogParser.FactContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link DatalogParser#end}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitEnd(DatalogParser.EndContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link DatalogParser#literalList}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -40,11 +34,23 @@ public interface DatalogVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFacts(DatalogParser.FactsContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link DatalogParser#condition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCondition(DatalogParser.ConditionContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link DatalogParser#rule}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitRule(DatalogParser.RuleContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link DatalogParser#end}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEnd(DatalogParser.EndContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link DatalogParser#rules}.
 	 * @param ctx the parse tree

@@ -8,10 +8,11 @@ public class Main {
             DBConnector.retrieveMetaData();
             System.out.println("COLUMNS: " + DBConnector.metaData.columns);
             System.out.println("SCHEMAS: " + DBConnector.metaData.schema);
-            // Example query
-            String tableName = "SpecialOffer";
-            String[] columnNames = {"15", "?x", "?y", "?z"};
-            DBConnector.query(tableName, columnNames);
+            /* Example query
+            *String tableName = "SpecialOffer";
+            *String[] columnNames = {"15", "?x", "?y", "?z"};
+            *DBConnector.query(tableName, columnNames);
+            */
             CharStream input = CharStreams.fromStream(System.in);
             DatalogLexer lexer = new DatalogLexer(input);
             CommonTokenStream tokens = new CommonTokenStream(lexer);

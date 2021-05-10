@@ -24,7 +24,7 @@ program
 
 // Facts that represent ground truth information
 fact
-    : predicate '(' literalList ')' '.'
+    : predicate '(' literalList ')' end
     ;
 
 literalList
@@ -35,17 +35,30 @@ facts
     : fact+
     ;
 
-// Horn clauses or rules in the query
-rule
-    : atom ':-' atoms '.'
+condition
+    : variableOrLiteral BIGGERTHAN variableOrLiteral
+    |variableOrLiteral BIGGEREQUALTHAN variableOrLiteral
+    |variableOrLiteral SMALLEREQUALTHAN variableOrLiteral
+    |variableOrLiteral SMALLERTHAN variableOrLiteral
+    |variableOrLiteral NOTEQUAL variableOrLiteral
+    |variableOrLiteral EQUAL variableOrLiteral
+    |
     ;
 
+// Horn clauses or rules in the query
+rule
+    : atom ':-' atoms end
+    ;
+
+end
+    : '.'
+    ;
 rules
     : rule+
     ;
 
 query
-    : '?-' atom
+    : '?-' atom condition end
     ;
 
 // Definition of atom (or goal) used in horn clauses (or rules)
@@ -410,4 +423,28 @@ COMMENT
 
 MULTILINE_COMMENT
     : '/*' ( MULTILINE_COMMENT | . )*? ('*/' | EOF) -> skip
+    ;
+
+BIGGERTHAN
+    : '>'
+    ;
+
+BIGGEREQUALTHAN
+    : '>='
+    ;
+
+SMALLERTHAN
+    : '<'
+    ;
+
+SMALLEREQUALTHAN
+    : '<='
+    ;
+
+NOTEQUAL
+    : '!='
+    ;
+
+EQUAL
+    : '=='
     ;
