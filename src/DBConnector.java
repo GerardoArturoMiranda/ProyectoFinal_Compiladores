@@ -13,11 +13,15 @@ public class DBConnector {
     public static void retrieveMetaData() {
         metaData = con.getMetaData();
     }
-
+    // Example: ?- Employee(1, ?x, ?y) ?x > 100 .
     public static void query(String tableName, String[] columnNames, Variable[] variables) {
         if (!metaData.columns.containsKey(tableName)) {
             System.out.println("El predicado " + tableName + " no existe en la base de datos.");
             return;
+        }
+
+        for (String s : columnNames) {
+            System.out.println("La columna es: " + s);
         }
 
         for (Variable var : variables) {

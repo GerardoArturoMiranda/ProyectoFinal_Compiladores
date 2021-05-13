@@ -44,6 +44,8 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
      */
     List<Variable> basicQueryVaribleList = new ArrayList<Variable>();
 
+    String[] nodeNames = DatalogParser.ruleNames;
+
     // ☾ Predicate Listener 'Student()'
     @Override public Node visitPredicate(DatalogParser.PredicateContext ctx) {
         basicQueryPredicates.add(ctx.getText());
@@ -51,14 +53,29 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         return visitChildren(ctx); }
     // ✩ Literal Listener '15'
     @Override public Node visitLiteral(DatalogParser.LiteralContext ctx) {
+        // Prevent variables to be saved in both visitLiteral and visitCondition
+        // That causes duplication of literals
+        // They'll be saved only on visitCondition
+        String parentX2NodeName = nodeNames[ctx.getParent().getParent().getRuleIndex()];
+        if (parentX2NodeName.equals("condition")) {
+            return visitChildren(ctx);
+        }
         basicQueryLiteralsList.add(ctx.getText());
         basicQueryLiterals.put(basicQueryIndex, basicQueryLiteralsList);
         return visitChildren(ctx); }
     // ✦ Variable Listener '?x'
     @Override public Node visitVariable(DatalogParser.VariableContext ctx) {
+        // Prevent variables to be saved in both visitVariable and visitCondition
+        // That causes duplication of variables
+        // They'll be saved only on visitCondition
+        String parentX2NodeName = nodeNames[ctx.getParent().getParent().getRuleIndex()];
+        if (parentX2NodeName.equals("condition")) {
+            return visitChildren(ctx);
+        }
         basicQueryLiteralsList.add(ctx.getText());
         basicQueryLiterals.put(basicQueryIndex, basicQueryLiteralsList);
-        return visitChildren(ctx); }
+        return visitChildren(ctx);
+    }
     // ❂ End Listener '.'
     @Override public Node visitEnd(DatalogParser.EndContext ctx) {
         DBConnector.query(basicQueryPredicates.get(basicQueryIndex-1), basicQueryLiterals.get(basicQueryIndex).toArray(String[]::new),
