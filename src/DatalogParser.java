@@ -40,7 +40,7 @@ public class DatalogParser extends Parser {
 		return new String[] {
 			null, "'('", "')'", "','", "':-'", "'.'", "'?-'", "'not'", "'count'", 
 			"'avg'", "'sum'", "'min'", "'max'", null, null, null, null, null, null, 
-			null, null, null, null, "'>'", "'>='", "'<'", "'<='", "'!='", "'=='"
+			null, null, null, null, "'>'", "'>='", "'<'", "'<='", "'<>'", "'='"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();

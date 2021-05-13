@@ -167,7 +167,7 @@ public class connectURL {
 			// String SQL = leeArchivo(args[0]);
 
 			// Get metadata
-			String SQL = "SELECT * FROM Sales.SpecialOffer";
+			String SQL = "WITH DirectReports (ManagerID, EmployeeID, Title, DeptID, Level) AS SELECT (e.ManagerID, e.EmployeeID, e.Title, edh.DepartmentID, 0) AS LevelFROM HumanResources.Employee AS e  INNER JOIN HumanResources.EmployeeDepartmentHistory AS edh  ON e.EmployeeID = edh.EmployeeID AND edh.EndDate IS NULL  WHERE ManagerID IS NULL UNION ALL } SELECT ManagerID as ManagerID, EmployeeID as EmployeeID, Title as Title, Level as Level  FROM DirectReports  INNER JOIN HumanResources.Department AS dp  ON DirectReports.DeptID = dp.DepartmentID  WHERE dp.GroupName = N'Research and Development' OR Level = 0";
 			System.out.println(SQL);
 			stmt = con.createStatement();
 			rs = stmt.executeQuery(SQL);

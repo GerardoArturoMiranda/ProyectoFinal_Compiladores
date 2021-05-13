@@ -26,8 +26,8 @@ null
 '>='
 '<'
 '<='
-'!='
-'=='
+'<>'
+'='
 
 token symbolic names:
 null

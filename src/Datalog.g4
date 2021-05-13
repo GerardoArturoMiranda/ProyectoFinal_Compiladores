@@ -442,9 +442,9 @@ SMALLEREQUALTHAN
     ;
 
 NOTEQUAL
-    : '!='
+    : '<>'
     ;
 
 EQUAL
-    : '=='
+    : '='
     ;

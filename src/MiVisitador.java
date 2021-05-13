@@ -1,4 +1,6 @@
 
+import Pojos.Variable;
+
 import java.util.*;
 public class MiVisitador extends DatalogBaseVisitor<Node>{
     /*
@@ -34,6 +36,13 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
      *           ° this variable will be cleared in every fact °
      */
     List<String> basicQueryLiteralsList =new ArrayList<String>();
+    /* ⭑ Purpose of: basicQueryIndex.
+     *           Saves all the Variables of the query  as a LIST, in order for the correct
+     *           execution and insertion of multiple queries, it is a must
+     *           to have an array of variables for the method of QUERY
+     *           ° this variable will be cleared in every Query °
+     */
+    List<Variable> basicQueryVaribleList = new ArrayList<Variable>();
 
     // ☾ Predicate Listener 'Student()'
     @Override public Node visitPredicate(DatalogParser.PredicateContext ctx) {
@@ -52,15 +61,40 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         return visitChildren(ctx); }
     // ❂ End Listener '.'
     @Override public Node visitEnd(DatalogParser.EndContext ctx) {
-        DBConnector.retrieveMetaData();
-        DBConnector.query(basicQueryPredicates.get(basicQueryIndex-1), basicQueryLiterals.get(basicQueryIndex).toArray(String[]::new) );
+        DBConnector.query(basicQueryPredicates.get(basicQueryIndex-1), basicQueryLiterals.get(basicQueryIndex).toArray(String[]::new),
+                basicQueryVaribleList.toArray(Variable[]::new) );
         basicQueryLiterals.clear();
+        basicQueryVaribleList.clear();
         return visitChildren(ctx); }
     // ✮ Query Listener '?-'
+
+    /*
+        This method might be deleted later.
     @Override public Node visitQuery(DatalogParser.QueryContext ctx) {
         DBConnector.retrieveMetaData();
-        DBConnector.query(basicQueryPredicates.get(basicQueryIndex-1), basicQueryLiterals.get(basicQueryIndex).toArray(String[]::new) );
+        DBConnector.query(basicQueryPredicates.get(basicQueryIndex-1), basicQueryLiterals.get(basicQueryIndex).toArray(String[]::new),
+                basicQueryVaribleList.toArray(Variable[]::new) );
         basicQueryLiterals.clear();
+        basicQueryVaribleList.clear();
         return visitChildren(ctx); }
+     */
+
+    // • Query Listener '?x > 25'
+    @Override public Node visitCondition(DatalogParser.ConditionContext ctx) {
+        Variable var = new Variable(ctx.getChild(0).getText(), ctx.getChild(1).getText(), ctx.getChild(2).getText());
+        basicQueryVaribleList.add(var);
+        return visitChildren(ctx);
+    }
+
+    // • Rule Listener 'Employee(?x) :- '
+    @Override public Node visitRules(DatalogParser.RulesContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    // • Programa Inicio
+    @Override public Node visitProgram(DatalogParser.ProgramContext ctx) {
+        DBConnector.retrieveMetaData();
+        return visitChildren(ctx); }
+
 }
 
