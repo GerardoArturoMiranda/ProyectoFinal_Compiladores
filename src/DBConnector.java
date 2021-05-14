@@ -1,9 +1,11 @@
 import Docker.Conexion.connectURL;
 import Pojos.Atom;
 import Pojos.MetaData;
-import Pojos.Variable;
+import Pojos.Condition;
+import Pojos.VariableOrLiteral;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DBConnector {
@@ -14,18 +16,14 @@ public class DBConnector {
         metaData = con.getMetaData();
     }
     // Example: ?- Employee(1, ?x, ?y) ?x > 100 .
-    public static void query(String tableName, String[] columnNames, Variable[] variables) {
+    public static void query(String tableName, VariableOrLiteral[] varOrLit, Condition[] conditionals) {
         if (!metaData.columns.containsKey(tableName)) {
             System.out.println("El predicado " + tableName + " no existe en la base de datos.");
             return;
         }
 
-        for (String s : columnNames) {
-            System.out.println("La columna es: " + s);
-        }
-
-        for (Variable var : variables) {
-            System.out.println("La variable es:" + var.toString());
+        for (Condition cond : conditionals) {
+            System.out.println("La condicional es:" + cond.toString());
         }
         // Build query
         StringBuilder SQL = new StringBuilder();
@@ -33,12 +31,13 @@ public class DBConnector {
         // Build SELECT section
         SQL.append("SELECT ");
         // Find target columns
-        for (int i = 0; i < columnNames.length; i++) {
-            // Target columns start with ?
-            if (columnNames[i].charAt(0) == '?') {
+        for (int i = 0; i < varOrLit.length; i++) {
+            if (varOrLit[i].getType().equals(VariableOrLiteral.VARIABLE)) {
                 ArrayList<String> tableColumns = metaData.columns.get(tableName);
                 String targetColumnName = tableColumns.get(i);
                 SQL.append(targetColumnName + ",");
+                // Save for later use
+                varOrLit[i].setColumnName(targetColumnName);
             }
         }
         // Remove trailing comma
@@ -51,17 +50,35 @@ public class DBConnector {
         SQL.append("WHERE");
 
 
-        // Find target columns
-        for (int i = 0; i < columnNames.length; i++) {
+        // Find target rows
+        for (int i = 0; i < varOrLit.length; i++) {
 
             // Target columns start with ?
-            if (columnNames[i].charAt(0) != '?') {
+            if (varOrLit[i].getType().equals(VariableOrLiteral.LITERAL)) {
                 ArrayList<String> tableColumns = metaData.columns.get(tableName);
                 String targetColumnName = tableColumns.get(i);
-                SQL.append(" " + targetColumnName + "='" + columnNames[i] + "' AND");
+                SQL.append(" " + targetColumnName + "='" + varOrLit[i].getKey() + "' AND");
+                // Save for later use
+                varOrLit[i].setColumnName(targetColumnName);
             }
 
         }
+
+        for (VariableOrLiteral vl : varOrLit) {
+            System.out.println("La variable o literal es: " + vl);
+        }
+
+        // Add relational conditions
+        for (int i = 0; i < conditionals.length; i++) {
+            String variable = conditionals[i].getVariable();
+            String targetColumnName = Arrays.stream(varOrLit)
+                    .filter(vl -> vl.getKey().equals(variable))
+                    .findFirst()
+                    .get()
+                    .getColumnName();
+            SQL.append(" " + targetColumnName + conditionals[i].getOperador() + "'" + conditionals[i].getValor() + "' AND");
+        }
+
         // Remove trailing AND
         SQL.delete(SQL.length() - 4, SQL.length());
 

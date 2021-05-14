@@ -1,5 +1,6 @@
 
-import Pojos.Variable;
+import Pojos.Condition;
+import Pojos.VariableOrLiteral;
 
 import java.util.*;
 public class MiVisitador extends DatalogBaseVisitor<Node>{
@@ -22,8 +23,8 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
      *          Literal: 15
      *          Variable: ?x
      */
-    Hashtable<Integer, List<String>> basicQueryLiterals
-            = new Hashtable<Integer, List<String>>();
+    Hashtable<Integer, List<VariableOrLiteral>> basicQueryLiterals
+            = new Hashtable<Integer, List<VariableOrLiteral>>();
     /* ⭑ Purpose of: basicQueryIndex.
      *           Saves the index of the fact, this variable will be
      *           useful in order to support multiple queries insertion.
@@ -35,14 +36,14 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
      *           to have the Hashtable's values as Lists.
      *           ° this variable will be cleared in every fact °
      */
-    List<String> basicQueryLiteralsList =new ArrayList<String>();
+    List<VariableOrLiteral> basicQueryLiteralsList =new ArrayList<VariableOrLiteral>();
     /* ⭑ Purpose of: basicQueryIndex.
      *           Saves all the Variables of the query  as a LIST, in order for the correct
      *           execution and insertion of multiple queries, it is a must
      *           to have an array of variables for the method of QUERY
      *           ° this variable will be cleared in every Query °
      */
-    List<Variable> basicQueryVaribleList = new ArrayList<Variable>();
+    List<Condition> basicQueryConditionList = new ArrayList<Condition>();
 
     String[] nodeNames = DatalogParser.ruleNames;
 
@@ -60,7 +61,7 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         if (parentX2NodeName.equals("condition")) {
             return visitChildren(ctx);
         }
-        basicQueryLiteralsList.add(ctx.getText());
+        basicQueryLiteralsList.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.LITERAL));
         basicQueryLiterals.put(basicQueryIndex, basicQueryLiteralsList);
         return visitChildren(ctx); }
     // ✦ Variable Listener '?x'
@@ -72,16 +73,16 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         if (parentX2NodeName.equals("condition")) {
             return visitChildren(ctx);
         }
-        basicQueryLiteralsList.add(ctx.getText());
+        basicQueryLiteralsList.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.VARIABLE));
         basicQueryLiterals.put(basicQueryIndex, basicQueryLiteralsList);
         return visitChildren(ctx);
     }
     // ❂ End Listener '.'
     @Override public Node visitEnd(DatalogParser.EndContext ctx) {
-        DBConnector.query(basicQueryPredicates.get(basicQueryIndex-1), basicQueryLiterals.get(basicQueryIndex).toArray(String[]::new),
-                basicQueryVaribleList.toArray(Variable[]::new) );
+        DBConnector.query(basicQueryPredicates.get(basicQueryIndex-1), basicQueryLiterals.get(basicQueryIndex).toArray(VariableOrLiteral[]::new),
+                basicQueryConditionList.toArray(Condition[]::new) );
         basicQueryLiterals.clear();
-        basicQueryVaribleList.clear();
+        basicQueryConditionList.clear();
         return visitChildren(ctx); }
     // ✮ Query Listener '?-'
 
@@ -98,8 +99,8 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
 
     // • Query Listener '?x > 25'
     @Override public Node visitCondition(DatalogParser.ConditionContext ctx) {
-        Variable var = new Variable(ctx.getChild(0).getText(), ctx.getChild(1).getText(), ctx.getChild(2).getText());
-        basicQueryVaribleList.add(var);
+        Condition var = new Condition(ctx.getChild(0).getText(), ctx.getChild(1).getText(), ctx.getChild(2).getText());
+        basicQueryConditionList.add(var);
         return visitChildren(ctx);
     }
 

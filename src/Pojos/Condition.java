@@ -1,11 +1,11 @@
 package Pojos;
 
-public class Variable {
+public class Condition {
     private String variable;
     private  String operador;
     private String valor;
 
-    public Variable(String variable, String operador, String valor) {
+    public Condition(String variable, String operador, String valor) {
         this.variable = variable;
         this.operador = operador;
         this.valor = valor;
@@ -37,7 +37,7 @@ public class Variable {
 
     @Override
     public String toString() {
-        return "Variable{" +
+        return "Condition{" +
                 "variable='" + variable + '\'' +
                 ", operador='" + operador + '\'' +
                 ", valor='" + valor + '\'' +
