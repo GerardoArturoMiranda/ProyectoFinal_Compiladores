@@ -46,9 +46,18 @@ public class DBConnector {
         // Build FROM section
         SQL.append(" FROM " + metaData.schema.get(tableName) + "." + tableName + " ");
 
+        // If there are no literals and no conditions, WHERE clause is not needed
+        VariableOrLiteral[] literals = Arrays.stream(varOrLit)
+                .filter(lit -> lit.getType().equals(VariableOrLiteral.LITERAL))
+                .toArray(VariableOrLiteral[]::new);
+        if (literals.length == 0 && conditionals.length == 0) {
+            System.out.println("QUERY: " + SQL.toString());
+            con.query(SQL.toString());
+            return;
+        }
+
         // Build WHERE section
         SQL.append("WHERE");
-
 
         // Find target rows
         for (int i = 0; i < varOrLit.length; i++) {
