@@ -15,6 +15,8 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
     *           will be sent to the query method of the DBConnect.
      */
     List<String> basicQueryPredicates =new ArrayList<String>();
+
+
     /* ⭑ Purpose of: basicQueryLiterals.
      *           Saves all the literals that the user might insert
      *           during the execution of the program, this String array
@@ -23,7 +25,8 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
      *          Literal: 15
      *          Variable: ?x
      */
-    Hashtable<Integer, List<VariableOrLiteral>> basicQueryLiterals
+
+    Hashtable<Integer, List<VariableOrLiteral>> basicQueryFullExpresions
             = new Hashtable<Integer, List<VariableOrLiteral>>();
     /* ⭑ Purpose of: basicQueryIndex.
      *           Saves the index of the fact, this variable will be
@@ -36,14 +39,10 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
      *           to have the Hashtable's values as Lists.
      *           ° this variable will be cleared in every fact °
      */
-    List<VariableOrLiteral> basicQueryLiteralsList =new ArrayList<VariableOrLiteral>();
-    /* ⭑ Purpose of: basicQueryIndex.
-     *           Saves all the Variables of the query  as a LIST, in order for the correct
-     *           execution and insertion of multiple queries, it is a must
-     *           to have an array of variables for the method of QUERY
-     *           ° this variable will be cleared in every Query °
-     */
-    List<Condition> basicQueryConditionList = new ArrayList<Condition>();
+
+    List<VariableOrLiteral> basicQueryLiteralsOrVariables =new ArrayList<VariableOrLiteral>();
+
+    List<Condition> basicQueryConditions = new ArrayList<Condition>();
 
     String[] nodeNames = DatalogParser.ruleNames;
 
@@ -52,6 +51,7 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         basicQueryPredicates.add(ctx.getText());
         basicQueryIndex++;
         return visitChildren(ctx); }
+
     // ✩ Literal Listener '15'
     @Override public Node visitLiteral(DatalogParser.LiteralContext ctx) {
         // Prevent variables to be saved in both visitLiteral and visitCondition
@@ -61,9 +61,10 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         if (parentX2NodeName.equals("condition")) {
             return visitChildren(ctx);
         }
-        basicQueryLiteralsList.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.LITERAL));
-        basicQueryLiterals.put(basicQueryIndex, basicQueryLiteralsList);
+        basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.LITERAL));
+        basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
         return visitChildren(ctx); }
+
     // ✦ Variable Listener '?x'
     @Override public Node visitVariable(DatalogParser.VariableContext ctx) {
         // Prevent variables to be saved in both visitVariable and visitCondition
@@ -73,17 +74,19 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         if (parentX2NodeName.equals("condition")) {
             return visitChildren(ctx);
         }
-        basicQueryLiteralsList.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.VARIABLE));
-        basicQueryLiterals.put(basicQueryIndex, basicQueryLiteralsList);
+        basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.VARIABLE));
+        basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
         return visitChildren(ctx);
     }
+
     // ❂ End Listener '.'
     @Override public Node visitEnd(DatalogParser.EndContext ctx) {
-        DBConnector.query(basicQueryPredicates.get(basicQueryIndex-1), basicQueryLiterals.get(basicQueryIndex).toArray(VariableOrLiteral[]::new),
-                basicQueryConditionList.toArray(Condition[]::new) );
-        basicQueryLiterals.clear();
-        basicQueryConditionList.clear();
+        DBConnector.query(basicQueryPredicates.get(basicQueryIndex-1), basicQueryFullExpresions.get(basicQueryIndex).toArray(VariableOrLiteral[]::new),
+                basicQueryConditions.toArray(Condition[]::new) );
+        basicQueryLiteralsOrVariables.clear();
+        basicQueryConditions.clear();
         return visitChildren(ctx); }
+
     // ✮ Query Listener '?-'
 
     /*
@@ -97,10 +100,10 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         return visitChildren(ctx); }
      */
 
-    // • Query Listener '?x > 25'
+    // • Condition Listener '?x > 25'
     @Override public Node visitCondition(DatalogParser.ConditionContext ctx) {
-        Condition var = new Condition(ctx.getChild(0).getText(), ctx.getChild(1).getText(), ctx.getChild(2).getText());
-        basicQueryConditionList.add(var);
+        Condition con  = new Condition(ctx.getChild(0).getText(), ctx.getChild(1).getText(), ctx.getChild(2).getText());
+        basicQueryConditions.add(con);
         return visitChildren(ctx);
     }
 
@@ -109,7 +112,7 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         return visitChildren(ctx);
     }
 
-    // • Programa Inicio
+    //  «» Programa Inicio
     @Override public Node visitProgram(DatalogParser.ProgramContext ctx) {
         DBConnector.retrieveMetaData();
         return visitChildren(ctx); }
