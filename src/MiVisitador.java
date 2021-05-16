@@ -60,10 +60,14 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         String parentX2NodeName = nodeNames[ctx.getParent().getParent().getRuleIndex()];
         if (parentX2NodeName.equals("condition")) {
             return visitChildren(ctx);
+        } else if (parentX2NodeName.equals("atom")) {
+            return visitChildren(ctx);
+        } else {
+            basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.LITERAL));
+            basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
+            return visitChildren(ctx);
         }
-        basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.LITERAL));
-        basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
-        return visitChildren(ctx); }
+    }
 
     // ✦ Variable Listener '?x'
     @Override public Node visitVariable(DatalogParser.VariableContext ctx) {
@@ -73,11 +77,15 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         String parentX2NodeName = nodeNames[ctx.getParent().getParent().getRuleIndex()];
         if (parentX2NodeName.equals("condition")) {
             return visitChildren(ctx);
+        } else if (parentX2NodeName.equals("atom")) {
+            return visitChildren(ctx);
+        } else {
+            basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.VARIABLE));
+            basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
+            return visitChildren(ctx);
         }
-        basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.VARIABLE));
-        basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
-        return visitChildren(ctx);
     }
+
 
     // ❂ End Listener '.'
     @Override public Node visitEnd(DatalogParser.EndContext ctx) {
