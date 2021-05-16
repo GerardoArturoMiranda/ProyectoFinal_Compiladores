@@ -58,7 +58,7 @@ rules
     ;
 
 query
-    : '?-' atom condition end
+    : '?-' atom ( ',' condition ) * end
     ;
 
 // Definition of atom (or goal) used in horn clauses (or rules)
