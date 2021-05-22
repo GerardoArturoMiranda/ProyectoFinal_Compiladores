@@ -1,4 +1,5 @@
 
+import Pojos.Atom;
 import Pojos.Condition;
 import Pojos.VariableOrLiteral;
 
@@ -44,6 +45,22 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
 
     List<Condition> basicQueryConditions = new ArrayList<Condition>();
 
+    /*
+    *
+    *
+     */
+
+    Atom ruleHeadAtom;
+    /*
+    *
+     */
+    List<Atom> ruleBodyAtoms = new ArrayList<>();
+
+    List<VariableOrLiteral> ruleHeadAtomLiteralsOrVariables = new ArrayList<>();
+
+
+    boolean bodyAtomSemaphore = false;
+    boolean executeRuleQuery = false;
     String[] nodeNames = DatalogParser.ruleNames;
 
     // ☾ Predicate Listener 'Student()'
@@ -58,12 +75,25 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         // That causes duplication of literals
         // They'll be saved only on visitCondition
         String parentX2NodeName = nodeNames[ctx.getParent().getParent().getRuleIndex()];
-        if (parentX2NodeName.equals("condition")) {
+
+        String parentX3NodeName = nodeNames[ctx.getParent().getParent().getParent().getRuleIndex()];
+
+
+        if(parentX3NodeName.equals("atom") && !bodyAtomSemaphore) {
+            ruleHeadAtomLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.LITERAL));
             return visitChildren(ctx);
         }
-        basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.LITERAL));
-        basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
-        return visitChildren(ctx); }
+        if (parentX2NodeName.equals("condition")) {
+            return visitChildren(ctx);
+        } else if (parentX2NodeName.equals("atom")) {
+            return visitChildren(ctx);
+        } else {
+            basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.LITERAL));
+            basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
+            return visitChildren(ctx);
+        }
+
+    }
 
     // ✦ Variable Listener '?x'
     @Override public Node visitVariable(DatalogParser.VariableContext ctx) {
@@ -71,18 +101,34 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         // That causes duplication of variables
         // They'll be saved only on visitCondition
         String parentX2NodeName = nodeNames[ctx.getParent().getParent().getRuleIndex()];
-        if (parentX2NodeName.equals("condition")) {
+
+        String parentX3NodeName = nodeNames[ctx.getParent().getParent().getParent().getRuleIndex()];
+
+        if(parentX3NodeName.equals("atom") && !bodyAtomSemaphore) {
+            ruleHeadAtomLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.VARIABLE));
             return visitChildren(ctx);
         }
-        basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.VARIABLE));
-        basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
-        return visitChildren(ctx);
+        if (parentX2NodeName.equals("condition")) {
+            return visitChildren(ctx);
+        } else if (parentX2NodeName.equals("atom")) {
+            return visitChildren(ctx);
+        } else {
+            basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.VARIABLE));
+            basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
+            return visitChildren(ctx);
+        }
     }
+
 
     // ❂ End Listener '.'
     @Override public Node visitEnd(DatalogParser.EndContext ctx) {
-        DBConnector.query(basicQueryPredicates.get(basicQueryIndex-1), basicQueryFullExpresions.get(basicQueryIndex).toArray(VariableOrLiteral[]::new),
-                basicQueryConditions.toArray(Condition[]::new) );
+        if(executeRuleQuery){
+            DBConnector.ruleQuery(ruleHeadAtom, ruleBodyAtoms.toArray(Atom[]::new));
+            executeRuleQuery = false;
+        }else{
+            DBConnector.query(basicQueryPredicates.get(basicQueryIndex-1), basicQueryFullExpresions.get(basicQueryIndex).toArray(VariableOrLiteral[]::new),
+                    basicQueryConditions.toArray(Condition[]::new) );
+        }
         basicQueryLiteralsOrVariables.clear();
         basicQueryConditions.clear();
         return visitChildren(ctx); }
@@ -107,8 +153,32 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         return visitChildren(ctx);
     }
 
-    // • Rule Listener 'Employee(?x) :- '
-    @Override public Node visitRules(DatalogParser.RulesContext ctx) {
+    // *$* Atom Listener
+    @Override public Node visitAtom(DatalogParser.AtomContext ctx) {
+        List<VariableOrLiteral> ruleBodyAtomLiteralsOrVariables = new ArrayList<>();
+        String parentX1NodeName = nodeNames[ctx.getParent().getRuleIndex()];
+        if (parentX1NodeName.equals("atoms")) {
+            // BodyAtoms Case
+            String ruleBodyColumnName = ctx.getChild(0).getText();
+            String[] ruleBodyVariablesOrLiterals = ctx.getChild(2).getText().split(",");
+            for(int i = 0; i < ruleBodyVariablesOrLiterals.length; i++){
+                System.out.println(ruleBodyVariablesOrLiterals[i].charAt(0));
+                if(ruleBodyVariablesOrLiterals[i].charAt(0) == '?'){
+                    ruleBodyAtomLiteralsOrVariables.add(new VariableOrLiteral(ruleBodyVariablesOrLiterals[i], ruleBodyColumnName, VariableOrLiteral.VARIABLE));
+                }else{
+                    ruleBodyAtomLiteralsOrVariables.add(new VariableOrLiteral(ruleBodyVariablesOrLiterals[i], ruleBodyColumnName, VariableOrLiteral.LITERAL));
+                }
+            }
+            ruleBodyAtoms.add(new Atom(ruleBodyColumnName, ruleBodyAtomLiteralsOrVariables));
+        }else{
+            // HeadAtom Case
+            ruleHeadAtom = new Atom(ctx.getChild(0).getText(), ruleHeadAtomLiteralsOrVariables);
+        }
+        return visitChildren(ctx);
+    }
+
+    @Override public Node visitAtoms(DatalogParser.AtomsContext ctx) {
+        bodyAtomSemaphore = true;
         return visitChildren(ctx);
     }
 
@@ -117,5 +187,9 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         DBConnector.retrieveMetaData();
         return visitChildren(ctx); }
 
+    @Override public Node visitRules(DatalogParser.RulesContext ctx) {
+        executeRuleQuery = true;
+        return visitChildren(ctx);
+    }
 }
 

@@ -96,52 +96,66 @@ public class DBConnector {
     }
 
 
+
     public static void ruleQuery(Atom headAtom, Atom[] bodyAtoms){
-        List<String> tableNameOfAtomsSchemas = new ArrayList<String>();
-        
-        /*
-        WITH DirectReports (ManagerID, EmployeeID, Title, DeptID, Level)
-                        AS
-                        (
-                            SELECT e.ManagerID, e.EmployeeID, e.Title, edh.DepartmentID,
-                                0 AS Level
-                            FROM HumanResources.Employee AS e
-                            INNER JOIN HumanResources.EmployeeDepartmentHistory AS edh
-                                ON e.EmployeeID = edh.EmployeeID AND edh.EndDate IS NULL
-                            WHERE ManagerID IS NULL
-                            UNION ALL
-                         }
-                SELECT ManagerID as ManagerID, EmployeeID as EmployeeID, Title as Title, Level as Level
-                FROM DirectReports
-                INNER JOIN HumanResources.Department AS dp
-                    ON DirectReports.DeptID = dp.DepartmentID
-                WHERE dp.GroupName = N'Research and Development' OR Level = 0;
 
-
-                SQL.append(" FROM " + metaData.schema.get(tableName) + "." + tableName + " ");
-         */
-
-        // Starting the construction for the String
-        /*
-        StringBuilder SQL = new StringBuilder();
-        SQL.append("WITH" + headAtom.getTableName());
-        SQL.append("(");
-        for(int i = 0; i < headAtom.getAtributes().size(); i++){
-            SQL.append(headAtom.getAtributes().get(i));
-            SQL.append(",");
+        System.out.println(headAtom.toString());
+        for(int i = 0; i < bodyAtoms.length; i++){
+            System.out.println(bodyAtoms[i].toString());
         }
+
+        List<String> tableNameOfAtomsSchemas = new ArrayList<String>();
+        if (!metaData.columns.containsKey(headAtom.getTableName())) {
+            System.out.println("El predicado del átomo cabeza no existe en la base de datos.");
+            return;
+        }
+
+        /*
+             WITH Hermano (Hermano1Nombre, Hermano2Nombre)
+            AS
+            (
+                SELECT PadreDe.Persona1Nombre, PadreDe.Persona2Nombre
+                INNER JOIN
+                    ON PadreDe.Persona2Nombre = PadreDe.Persona2Nombre
+            )
+            SELECT *
+            FROM Hermano;
+
+         */
+        StringBuilder SQL = new StringBuilder();
+
+        // Build SELECT section
+        SQL.append("WITH ");
+
+        SQL.append(headAtom.getTableName() + " (");
+        for(int i  = 0; i < headAtom.getAttributesOrLiterals().size(); i++){
+            try {
+                SQL.append(headAtom.getAttributesOrLiterals().get(i).getKey() + ",");
+            } catch (NullPointerException e) {
+                System.out.print("Caught the NullPointerException");
+            }
+        }
+        // Remove trailing comma
         SQL.deleteCharAt(SQL.length() - 1);
         SQL.append(")");
-        SQL.append("AS (");
-        for(int i = 0; i < bodyAtoms.length; i++){
-            tableNameOfAtomsSchemas.add(metaData.schema.get(bodyAtoms[i].getTableName()));
+        SQL.append(" AS(");
+        // Build SELECT section
+        SQL.append("SELECT ");
+        // Find possibleJoin
+        boolean possibleJoin = false;
+        for (int i= 0; i < bodyAtoms[i].getAttributesOrLiterals().size(); i++) {
+            for(int j = i+1; j < bodyAtoms[j].getAttributesOrLiterals().size(); j++){
+                try {
+                    if(bodyAtoms[i].getAttributesOrLiterals().get(j).getKey().equals(bodyAtoms[j].getAttributesOrLiterals().get(j).getKey())){
+                        possibleJoin = true;
+                    }else{
+                        possibleJoin = false;
+                    }
+                } catch (NullPointerException e) {
+                        System.out.print("Caught the NullPointerException");
+                    }
+                }
         }
-        // SELECT e.ManagerID, e.EmployeeID, e.Title, edh.DepartmentID,
-        SQL.append("SELECT");
-        for(int i = 0; i < bodyAtoms.length; i)
-        SQL.append(tableNameOfAtomsSchemas.);
-
-         */
 
     }
 }
