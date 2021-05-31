@@ -32,7 +32,7 @@ literalList
     ;
 
 facts
-    : fact+
+    : fact*
     ;
 
 condition

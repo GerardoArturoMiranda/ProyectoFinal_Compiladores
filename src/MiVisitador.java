@@ -45,6 +45,7 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
 
     List<Condition> basicQueryConditions = new ArrayList<Condition>();
 
+    boolean basicQuerySemaphore = false;
     /*
     *
     *
@@ -78,14 +79,22 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
 
         String parentX3NodeName = nodeNames[ctx.getParent().getParent().getParent().getRuleIndex()];
 
-
         if(parentX3NodeName.equals("atom") && !bodyAtomSemaphore) {
             ruleHeadAtomLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.LITERAL));
+            basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.LITERAL));
+            basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
+            return visitChildren(ctx);
+        }
+        if(parentX3NodeName.equals("atom") && !basicQuerySemaphore ) {
+            basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.LITERAL));
+            basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
             return visitChildren(ctx);
         }
         if (parentX2NodeName.equals("condition")) {
             return visitChildren(ctx);
         } else if (parentX2NodeName.equals("atom")) {
+            basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.LITERAL));
+            basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
             return visitChildren(ctx);
         } else {
             basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.LITERAL));
@@ -106,11 +115,21 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
 
         if(parentX3NodeName.equals("atom") && !bodyAtomSemaphore) {
             ruleHeadAtomLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.VARIABLE));
+            basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.VARIABLE));
+            basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
             return visitChildren(ctx);
         }
+        if(parentX3NodeName.equals("atom") && !basicQuerySemaphore ) {
+            basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.VARIABLE));
+            basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
+            return visitChildren(ctx);
+        }
+
         if (parentX2NodeName.equals("condition")) {
             return visitChildren(ctx);
         } else if (parentX2NodeName.equals("atom")) {
+            basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.VARIABLE));
+            basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
             return visitChildren(ctx);
         } else {
             basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.VARIABLE));
@@ -122,29 +141,28 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
 
     // ❂ End Listener '.'
     @Override public Node visitEnd(DatalogParser.EndContext ctx) {
-        if(executeRuleQuery){
-            DBConnector.ruleQuery(ruleHeadAtom, ruleBodyAtoms.toArray(Atom[]::new));
-            executeRuleQuery = false;
-        }else{
-            DBConnector.query(basicQueryPredicates.get(basicQueryIndex-1), basicQueryFullExpresions.get(basicQueryIndex).toArray(VariableOrLiteral[]::new),
+        if(basicQuerySemaphore){
+            DBConnector.query(basicQueryPredicates.get(basicQueryIndex-1),
+                    basicQueryFullExpresions.get(basicQueryIndex).toArray(VariableOrLiteral[]::new),
                     basicQueryConditions.toArray(Condition[]::new) );
         }
+
         basicQueryLiteralsOrVariables.clear();
         basicQueryConditions.clear();
+
         return visitChildren(ctx); }
 
     // ✮ Query Listener '?-'
 
-    /*
-        This method might be deleted later.
     @Override public Node visitQuery(DatalogParser.QueryContext ctx) {
         DBConnector.retrieveMetaData();
-        DBConnector.query(basicQueryPredicates.get(basicQueryIndex-1), basicQueryLiterals.get(basicQueryIndex).toArray(String[]::new),
-                basicQueryVaribleList.toArray(Variable[]::new) );
-        basicQueryLiterals.clear();
-        basicQueryVaribleList.clear();
+        if(executeRuleQuery){
+            DBConnector.ruleQuery(ruleHeadAtom, ruleBodyAtoms.toArray(Atom[]::new));
+            executeRuleQuery = false;
+        }else {
+            basicQuerySemaphore = true;
+        }
         return visitChildren(ctx); }
-     */
 
     // • Condition Listener '?x > 25'
     @Override public Node visitCondition(DatalogParser.ConditionContext ctx) {
