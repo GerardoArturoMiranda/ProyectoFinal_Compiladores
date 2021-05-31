@@ -117,7 +117,7 @@ public class DBConnector {
               // Join (Rule) entre distintas tablas
                                                                            = número de columnas de la tabla * cantidad de bodyAtoms
                                                                             { metadata.columnNames de bodyAtoms[] }
-             WITH Hermano (h1, h2, p1, p2)
+             WITH Hermano (nombreE{I} columnName2Tabla1, nombre, columnName2Tabla2)
             AS
             (
                 SELECT * FROM Parent as Pa1
@@ -142,10 +142,21 @@ public class DBConnector {
 
 
         SQL.append("WITH ");
-
+        SQL.append(headAtom.getTableName() + " (");
         //  Build SELECT "TableRule" section
-
-
+        int k = 0;
+        for (Atom bodyAtomInstance: bodyAtoms) {
+            for(int i = 0; i < bodyAtomInstance.getAttributesOrLiterals().size(); i++) {
+                if (bodyAtomInstance.getAttributesOrLiterals().get(i).getType().equals(VariableOrLiteral.VARIABLE)) {
+                    ArrayList<String> tableColumns = metaData.columns.get(bodyAtomInstance.getTableName());
+                    String targetColumnName = tableColumns.get(i);
+                    SQL.append(targetColumnName+(k) + ",");
+                    // Save for later use
+                    bodyAtomInstance.getAttributesOrLiterals().get(i).setColumnName(targetColumnName);
+                }
+                k++;
+            }
+        }
         // Remove trailing comma
         SQL.deleteCharAt(SQL.length() - 1);
 
@@ -161,19 +172,17 @@ public class DBConnector {
 
         boolean possibleJoin = false;
         for (int i= 0; i < bodyAtoms[i].getAttributesOrLiterals().size(); i++) {
-            for(int j = i+1; j < bodyAtoms[j].getAttributesOrLiterals().size(); j++){
                 try {
-                    if(bodyAtoms[i].getAttributesOrLiterals().get(j).getKey().equals(bodyAtoms[j].getAttributesOrLiterals().get(j).getKey())){
+                    innerJoinVariable = bodyAtoms[i].getAttributesOrLiterals().stream()
+                            .filter(al -> al.getColumnName().equals(bodyAtoms[i+1].getAttributesOrLiterals().get(i+1).getColumnName()))
+                            .findFirst()
+                            .get()
+                            .getColumnName();
                         possibleJoin = true;
-                        innerJoinVariable = bodyAtoms[i].getAttributesOrLiterals().get(j).getKey();
-                    }else{
-                        possibleJoin = false;
                     }
-                } catch (NullPointerException e) {
-                        System.out.print("Caught the NullPointerException");
-                    }
-                }
         }
+
+        System.out.println(innerJoinVariable);
         if(possibleJoin){
             for (Atom atomToCheck: bodyAtoms) {
                 for (int j = 0; j < atomToCheck.getAttributesOrLiterals().size(); j++) {

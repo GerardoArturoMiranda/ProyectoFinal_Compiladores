@@ -182,9 +182,9 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
             for(int i = 0; i < ruleBodyVariablesOrLiterals.length; i++){
                 System.out.println(ruleBodyVariablesOrLiterals[i].charAt(0));
                 if(ruleBodyVariablesOrLiterals[i].charAt(0) == '?'){
-                    ruleBodyAtomLiteralsOrVariables.add(new VariableOrLiteral(ruleBodyVariablesOrLiterals[i], ruleBodyColumnName, VariableOrLiteral.VARIABLE));
+                    ruleBodyAtomLiteralsOrVariables.add(new VariableOrLiteral(ruleBodyVariablesOrLiterals[i], null, VariableOrLiteral.VARIABLE));
                 }else{
-                    ruleBodyAtomLiteralsOrVariables.add(new VariableOrLiteral(ruleBodyVariablesOrLiterals[i], ruleBodyColumnName, VariableOrLiteral.LITERAL));
+                    ruleBodyAtomLiteralsOrVariables.add(new VariableOrLiteral(ruleBodyVariablesOrLiterals[i], null, VariableOrLiteral.LITERAL));
                 }
             }
             ruleBodyAtoms.add(new Atom(ruleBodyColumnName, ruleBodyAtomLiteralsOrVariables));
