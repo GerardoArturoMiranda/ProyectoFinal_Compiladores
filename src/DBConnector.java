@@ -21,10 +21,12 @@ public class DBConnector {
             System.out.println("El predicado " + tableName + " no existe en la base de datos.");
             return;
         }
-
-        for (Condition cond : conditionals) {
-            System.out.println("La condicional es:" + cond.toString());
+        if(conditionals.length > 0){
+            for (Condition cond : conditionals) {
+                System.out.println("La condicional es:" + cond.toString());
+            }
         }
+
         // Build query
         StringBuilder SQL = new StringBuilder();
 
@@ -98,56 +100,72 @@ public class DBConnector {
 
 
     public static void ruleQuery(Atom headAtom, Atom[] bodyAtoms){
-
+        String innerJoinVariable = "";
         System.out.println(headAtom.toString());
         for(int i = 0; i < bodyAtoms.length; i++){
             System.out.println(bodyAtoms[i].toString());
         }
 
-        List<String> tableNameOfAtomsSchemas = new ArrayList<String>();
-        if (!metaData.columns.containsKey(headAtom.getTableName())) {
-            System.out.println("El predicado del átomo cabeza no existe en la base de datos.");
-            return;
-        }
-
         /*
-             WITH Hermano (Hermano1Nombre, Hermano2Nombre)
+
+         Hermano(?x,?y):-Employee(?x), EmployeeAdrress(?y) .
+                                       {Todas las Columnas} {}
+              // Join (Rule) con la misma tabla
+
+              Número de atributos de la nueva tabla  = número de columnas de la tabla * cantidad de bodyAtoms
+                                                                            { metadata.columnNames de bodyAtoms[] }
+              // Join (Rule) entre distintas tablas
+                                                                           = número de columnas de la tabla * cantidad de bodyAtoms
+                                                                            { metadata.columnNames de bodyAtoms[] }
+             WITH Hermano (h1, h2, p1, p2)
             AS
             (
-                SELECT PadreDe.Persona1Nombre, PadreDe.Persona2Nombre
+                SELECT * FROM Parent as Pa1
                 INNER JOIN
-                    ON PadreDe.Persona2Nombre = PadreDe.Persona2Nombre
+                Parent as Pa2
+                    ON Pa1.Nombre= Pa2.Nombre
             )
+
+            // D A T A     L O G
+            ?- Hermano(?x,?y) , ?x = "Maria" .
+
             SELECT *
-            FROM Hermano;
+            WHERE Hermano.h1 = Maria
+            FROM Hermano
+
+
+
+
 
          */
         StringBuilder SQL = new StringBuilder();
 
-        // Build SELECT section
+
         SQL.append("WITH ");
 
-        SQL.append(headAtom.getTableName() + " (");
-        for(int i  = 0; i < headAtom.getAttributesOrLiterals().size(); i++){
-            try {
-                SQL.append(headAtom.getAttributesOrLiterals().get(i).getKey() + ",");
-            } catch (NullPointerException e) {
-                System.out.print("Caught the NullPointerException");
-            }
-        }
+        //  Build SELECT "TableRule" section
+
+
         // Remove trailing comma
         SQL.deleteCharAt(SQL.length() - 1);
+
+
+
+
         SQL.append(")");
-        SQL.append(" AS(");
+        SQL.append(" AS( ");
         // Build SELECT section
-        SQL.append("SELECT ");
+        SQL.append("SELECT * ");
+
         // Find possibleJoin
+
         boolean possibleJoin = false;
         for (int i= 0; i < bodyAtoms[i].getAttributesOrLiterals().size(); i++) {
             for(int j = i+1; j < bodyAtoms[j].getAttributesOrLiterals().size(); j++){
                 try {
                     if(bodyAtoms[i].getAttributesOrLiterals().get(j).getKey().equals(bodyAtoms[j].getAttributesOrLiterals().get(j).getKey())){
                         possibleJoin = true;
+                        innerJoinVariable = bodyAtoms[i].getAttributesOrLiterals().get(j).getKey();
                     }else{
                         possibleJoin = false;
                     }
@@ -156,6 +174,38 @@ public class DBConnector {
                     }
                 }
         }
+        if(possibleJoin){
+            for (Atom atomToCheck: bodyAtoms) {
+                for (int j = 0; j < atomToCheck.getAttributesOrLiterals().size(); j++) {
+                    if (atomToCheck.getAttributesOrLiterals().get(j).getType().equals(VariableOrLiteral.VARIABLE)) {
+                        ArrayList<String> tableColumns = metaData.columns.get(atomToCheck.getAttributesOrLiterals().get(j).getColumnName());
+                        String targetColumnName = tableColumns.get(j);
+                        SQL.append(targetColumnName + ",");
+                        // Save for later use
+                        atomToCheck.getAttributesOrLiterals().get(j).setColumnName(targetColumnName);
+                    }
+                }
+            }
+            // Remove trailing comma
+            SQL.deleteCharAt(SQL.length() - 1);
 
+            // Parte del ALÍAS
+
+            // Fin parte Alías
+
+            // Parte del Inner Join
+            SQL.append("INNER JOIN ON ");
+            for (Atom atomToCheck: bodyAtoms) {
+                SQL.append(atomToCheck.getTableName() + "." + innerJoinVariable + "=");
+            }
+            // Remove trailing equal
+            SQL.deleteCharAt(SQL.length() - 1);
+        }else{
+            System.out.println("There's no variable for joining the tables.");
+        }
+
+        // Query Section
+        SQL.append(") SELECT * FROM ");
+        SQL.append(headAtom.getTableName());
     }
 }
