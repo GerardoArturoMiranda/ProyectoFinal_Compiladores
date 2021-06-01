@@ -26,6 +26,19 @@ public class Atom {
         this.attributesOrLiterals = attributesOrLiterals;
     }
 
+    public String canBeJoined(Atom other) {
+        VariableOrLiteral exists;
+        for (VariableOrLiteral vl : getAttributesOrLiterals()) {
+                exists = other.getAttributesOrLiterals().stream()
+                    .filter(otherVl -> vl.getColumnName().equals(otherVl.getColumnName()))
+                    .findFirst().orElse(null);
+                if (exists != null) {
+                    return exists.getColumnName();
+                }
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         return "Atom{" +

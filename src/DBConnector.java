@@ -101,11 +101,6 @@ public class DBConnector {
 
     public static void ruleQuery(Atom headAtom, Atom[] bodyAtoms){
         String innerJoinVariable = "";
-        System.out.println(headAtom.toString());
-        for(int i = 0; i < bodyAtoms.length; i++){
-            System.out.println(bodyAtoms[i].toString());
-        }
-
         /*
 
          Hermano(?x,?y):-Employee(?x), EmployeeAdrress(?y) .
@@ -170,20 +165,24 @@ public class DBConnector {
 
         // Find possibleJoin
 
-        boolean possibleJoin = false;
-        for (int i= 0; i < bodyAtoms[i].getAttributesOrLiterals().size(); i++) {
-                try {
-                    innerJoinVariable = bodyAtoms[i].getAttributesOrLiterals().stream()
-                            .filter(al -> al.getColumnName().equals(bodyAtoms[i+1].getAttributesOrLiterals().get(i+1).getColumnName()))
-                            .findFirst()
-                            .get()
-                            .getColumnName();
-                        possibleJoin = true;
-                    }
+        for(int i = 0; i < bodyAtoms.length; i++){
+            System.out.println(bodyAtoms[i].toString());
         }
 
-        System.out.println(innerJoinVariable);
-        if(possibleJoin){
+        String colToJoin = null;
+        for (int i = 0; i < bodyAtoms.length; i++) {
+            for (int j = i + 1; j < bodyAtoms.length; j++) {
+                colToJoin = bodyAtoms[i].canBeJoined(bodyAtoms[j]);
+                if (colToJoin != null) {
+                    break;
+                }
+            }
+            if (colToJoin != null) {
+                break;
+            }
+        }
+
+        if(colToJoin != null){
             for (Atom atomToCheck: bodyAtoms) {
                 for (int j = 0; j < atomToCheck.getAttributesOrLiterals().size(); j++) {
                     if (atomToCheck.getAttributesOrLiterals().get(j).getType().equals(VariableOrLiteral.VARIABLE)) {
