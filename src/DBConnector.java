@@ -97,8 +97,6 @@ public class DBConnector {
         con.query(SQL.toString());
     }
 
-
-
     public static void ruleQuery(Atom headAtom, Atom[] bodyAtoms){
         String innerJoinVariable = "";
         /*
@@ -218,6 +216,10 @@ public class DBConnector {
         con.query(SQL.toString());
 
 
+
+    }
+
+    public static void recursiveQuery(){
 
     }
 }

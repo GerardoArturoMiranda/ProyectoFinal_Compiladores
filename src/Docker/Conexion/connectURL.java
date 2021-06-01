@@ -51,11 +51,11 @@ public class connectURL {
 
 			// Get metadata
 			stmt = con.createStatement();
-			//try {
+			try {
 				rs = stmt.executeQuery(SQL);
-			//} catch (Exception e) {
-				//return;
-			//}
+			} catch (Exception e) {
+				return;
+			}
 				rsmd = rs.getMetaData();
 
 
@@ -173,7 +173,7 @@ public class connectURL {
 			// String SQL = leeArchivo(args[0]);
 
 			// Get metadata
-			String SQL = "DROP TABLE IF EXISTS dbo.EmployeeHistoryD";
+			String SQL = "DROP TABLE IF EXISTS dbo.EmployeeDirection";
 			System.out.println(SQL);
 			stmt = con.createStatement();
 			rs = stmt.executeQuery(SQL);

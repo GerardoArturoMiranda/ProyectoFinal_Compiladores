@@ -66,10 +66,9 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
 
     // ☾ Predicate Listener 'Student()'
     @Override public Node visitPredicate(DatalogParser.PredicateContext ctx) {
-        basicQueryPredicates.add(ctx.getText());
-        basicQueryIndex++;
         return visitChildren(ctx); }
 
+    /*
     // ✩ Literal Listener '15'
     @Override public Node visitLiteral(DatalogParser.LiteralContext ctx) {
         // Prevent variables to be saved in both visitLiteral and visitCondition
@@ -137,15 +136,23 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
             return visitChildren(ctx);
         }
     }
+     */
 
 
     // ❂ End Listener '.'
     @Override public Node visitEnd(DatalogParser.EndContext ctx) {
-        if(basicQuerySemaphore){
+        if(basicQuerySemaphore) {
             DBConnector.query(basicQueryPredicates.get(basicQueryIndex-1),
                     basicQueryFullExpresions.get(basicQueryIndex).toArray(VariableOrLiteral[]::new),
-                    basicQueryConditions.toArray(Condition[]::new) );
+                    basicQueryConditions.toArray(Condition[]::new));
+
         }
+        if(executeRuleQuery){
+            // Inserting the ruleQuery in the Database.
+            DBConnector.ruleQuery(ruleHeadAtom, ruleBodyAtoms.toArray(Atom[]::new));
+            executeRuleQuery = false;
+        }
+
 
         basicQueryLiteralsOrVariables.clear();
         basicQueryConditions.clear();
@@ -156,12 +163,8 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
 
     @Override public Node visitQuery(DatalogParser.QueryContext ctx) {
         DBConnector.retrieveMetaData();
-        if(executeRuleQuery){
-            DBConnector.ruleQuery(ruleHeadAtom, ruleBodyAtoms.toArray(Atom[]::new));
-            executeRuleQuery = false;
-        }else {
-            basicQuerySemaphore = true;
-        }
+        basicQuerySemaphore = true;
+        basicQueryIndex++;
         return visitChildren(ctx); }
 
     // • Condition Listener '?x > 25'
@@ -188,9 +191,22 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
                 }
             }
             ruleBodyAtoms.add(new Atom(ruleBodyColumnName, ruleBodyAtomLiteralsOrVariables));
-        }else{
+        }else if(parentX1NodeName.equals("rule")){
             // HeadAtom Case
             ruleHeadAtom = new Atom(ctx.getChild(0).getText(), ruleHeadAtomLiteralsOrVariables);
+        }else if(basicQuerySemaphore){
+            String basicQueryPredicate = ctx.getChild(0).getText();
+            String[] basicQueryVariablesOrLiterals = ctx.getChild(2).getText().split(",");
+            for(int i = 0; i < basicQueryVariablesOrLiterals.length; i++){
+                System.out.println(basicQueryVariablesOrLiterals[i].charAt(0));
+                if(basicQueryVariablesOrLiterals[i].charAt(0) == '?'){
+                    basicQueryLiteralsOrVariables.add(new VariableOrLiteral(basicQueryVariablesOrLiterals[i], null, VariableOrLiteral.VARIABLE));
+                }else{
+                    basicQueryLiteralsOrVariables.add(new VariableOrLiteral(basicQueryVariablesOrLiterals[i], null, VariableOrLiteral.LITERAL));
+                }
+            }
+            basicQueryPredicates.add(basicQueryPredicate);
+            basicQueryFullExpresions.put(basicQueryIndex,  basicQueryLiteralsOrVariables);
         }
         return visitChildren(ctx);
     }
