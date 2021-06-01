@@ -161,9 +161,22 @@ public class DBConnector {
         SQL.append(")");
         SQL.append(" AS( ");
         // Build SELECT section
-        SQL.append("SELECT * ");
-
+        SQL.append("SELECT ");
+        for (Atom bodyAtomInstance: bodyAtoms) {
+            for(int i = 0; i < bodyAtomInstance.getAttributesOrLiterals().size(); i++) {
+                if (bodyAtomInstance.getAttributesOrLiterals().get(i).getType().equals(VariableOrLiteral.VARIABLE)) {
+                    ArrayList<String> tableColumns = metaData.columns.get(bodyAtomInstance.getTableName());
+                    String targetColumnName = tableColumns.get(i);
+                    SQL.append(bodyAtomInstance.getTableName()+"."+targetColumnName + ",");
+                    // Save for later use
+                    bodyAtomInstance.getAttributesOrLiterals().get(i).setColumnName(targetColumnName);
+                }
+            }
+        }
+        SQL.deleteCharAt(SQL.length() - 1);
         // Find possibleJoin
+
+        SQL.append(" FROM " + metaData.schema.get(bodyAtoms[0].getTableName()) + "." + bodyAtoms[0].getTableName());
 
         for(int i = 0; i < bodyAtoms.length; i++){
             System.out.println(bodyAtoms[i].toString());
@@ -182,38 +195,24 @@ public class DBConnector {
             }
         }
 
-        if(colToJoin != null){
-            for (Atom atomToCheck: bodyAtoms) {
-                for (int j = 0; j < atomToCheck.getAttributesOrLiterals().size(); j++) {
-                    if (atomToCheck.getAttributesOrLiterals().get(j).getType().equals(VariableOrLiteral.VARIABLE)) {
-                        ArrayList<String> tableColumns = metaData.columns.get(atomToCheck.getAttributesOrLiterals().get(j).getColumnName());
-                        String targetColumnName = tableColumns.get(j);
-                        SQL.append(targetColumnName + ",");
-                        // Save for later use
-                        atomToCheck.getAttributesOrLiterals().get(j).setColumnName(targetColumnName);
-                    }
-                }
-            }
-            // Remove trailing comma
-            SQL.deleteCharAt(SQL.length() - 1);
-
             // Parte del ALÍAS
 
             // Fin parte Alías
 
             // Parte del Inner Join
-            SQL.append("INNER JOIN ON ");
+            SQL.append(" INNER JOIN ");
+            SQL.append(metaData.schema.get(bodyAtoms[1].getTableName()) + "." + bodyAtoms[1].getTableName());
+        SQL.append(" ON ");
             for (Atom atomToCheck: bodyAtoms) {
-                SQL.append(atomToCheck.getTableName() + "." + innerJoinVariable + "=");
+                SQL.append(atomToCheck.getTableName() + "." + colToJoin+ "=");
             }
             // Remove trailing equal
             SQL.deleteCharAt(SQL.length() - 1);
-        }else{
-            System.out.println("There's no variable for joining the tables.");
-        }
 
         // Query Section
         SQL.append(") SELECT * FROM ");
         SQL.append(headAtom.getTableName());
+        System.out.println(SQL);
+        con.query(SQL.toString());
     }
 }
