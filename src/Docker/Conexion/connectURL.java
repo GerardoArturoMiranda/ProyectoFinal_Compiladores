@@ -51,8 +51,14 @@ public class connectURL {
 
 			// Get metadata
 			stmt = con.createStatement();
-			rs = stmt.executeQuery(SQL);
-			rsmd = rs.getMetaData();
+			//try {
+				rs = stmt.executeQuery(SQL);
+			//} catch (Exception e) {
+				//return;
+			//}
+				rsmd = rs.getMetaData();
+
+
 			for(int i = 1; i <= rsmd.getColumnCount(); i++) {
 
 				System.out.printf("%40s", rsmd.getColumnLabel(i));
@@ -167,7 +173,7 @@ public class connectURL {
 			// String SQL = leeArchivo(args[0]);
 
 			// Get metadata
-			String SQL = "SELECT * FROM EmployeeDirection";
+			String SQL = "DROP TABLE IF EXISTS dbo.EmployeeHistoryD";
 			System.out.println(SQL);
 			stmt = con.createStatement();
 			rs = stmt.executeQuery(SQL);
