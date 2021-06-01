@@ -210,9 +210,14 @@ public class DBConnector {
             SQL.deleteCharAt(SQL.length() - 1);
 
         // Query Section
-        SQL.append(") SELECT * FROM ");
+        SQL.append(") SELECT * ");
+        SQL.append("INTO " + headAtom.getTableName());
+        SQL.append(" FROM ");
         SQL.append(headAtom.getTableName());
         System.out.println(SQL);
         con.query(SQL.toString());
+
+
+
     }
 }
