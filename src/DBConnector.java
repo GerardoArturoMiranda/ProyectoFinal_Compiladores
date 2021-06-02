@@ -220,10 +220,8 @@ public class DBConnector {
 
     }
 
-    public static void recursiveQuery(Hashtable<Integer, List<Atom>> recursiveQueryBodyAtomsHashTable, Atom headAtom){
-
-
-        for(int i = 1; i <= recursiveQueryBodyAtomsHashTable.size(); i++){
+    public static void recursiveQuery(Hashtable<Integer, List<Atom>> recursiveQueryBodyAtomsHashTable, Atom headAtom) {
+        for (int i = 1; i <= recursiveQueryBodyAtomsHashTable.size(); i++) {
             System.out.println("\n");
             List<Atom> temporal = recursiveQueryBodyAtomsHashTable.get(i);
             for (int j = 0; j < temporal.size(); j++) {
@@ -233,5 +231,118 @@ public class DBConnector {
         }
 
         System.out.println("\n" + headAtom.toString());
+        StringBuilder SQL = new StringBuilder();
+        SQL.append("WITH ");
+        SQL.append(headAtom.getTableName() + " (");
+        //  Build SELECT "TableRule" section
+        int k = 0;
+        for (Atom bodyAtomInstance : recursiveQueryBodyAtomsHashTable.get(2)) {
+            for (int i = 0; i < bodyAtomInstance.getAttributesOrLiterals().size(); i++) {
+                if (bodyAtomInstance.getAttributesOrLiterals().get(i).getType().equals(VariableOrLiteral.VARIABLE)) {
+                    ArrayList<String> tableColumns = metaData.columns.get(bodyAtomInstance.getTableName());
+                    if(tableColumns != null){
+                        String targetColumnName = tableColumns.get(i);
+
+                    SQL.append(targetColumnName + (k) + ",");
+                    // Save for later use
+                    bodyAtomInstance.getAttributesOrLiterals().get(i).setColumnName(targetColumnName);
+                    }
+                }
+                k++;
+            }
+        }
+        // Remove trailing comma
+        SQL.deleteCharAt(SQL.length() - 1);
+        SQL.append(")");
+        SQL.append(" AS( ");
+        SQL.append("SELECT ");
+        for (Atom bodyAtomInstance: recursiveQueryBodyAtomsHashTable.get(1)) {
+            for(int i = 0; i < bodyAtomInstance.getAttributesOrLiterals().size(); i++) {
+                if (bodyAtomInstance.getAttributesOrLiterals().get(i).getType().equals(VariableOrLiteral.VARIABLE)) {
+                    ArrayList<String> tableColumns = metaData.columns.get(bodyAtomInstance.getTableName());
+                    String targetColumnName = tableColumns.get(i);
+                    SQL.append(bodyAtomInstance.getTableName()+"."+targetColumnName + ",");
+                    // Save for later use
+                    bodyAtomInstance.getAttributesOrLiterals().get(i).setColumnName(targetColumnName);
+                }
+            }
+        }
+        SQL.deleteCharAt(SQL.length() - 1);
+        // Find possibleJoin
+
+        SQL.append(" FROM " + metaData.schema.get(recursiveQueryBodyAtomsHashTable.get(1).get(0).getTableName()) + "." + recursiveQueryBodyAtomsHashTable.get(1).get(0).getTableName());
+
+        String colToJoin = null;
+        for (int i = 0; i < recursiveQueryBodyAtomsHashTable.get(2).size(); i++) {
+            for (int j = i + 1; j < recursiveQueryBodyAtomsHashTable.get(2).size(); j++) {
+                colToJoin = recursiveQueryBodyAtomsHashTable.get(2).get(i).canBeJoined(recursiveQueryBodyAtomsHashTable.get(2).get(j));
+                if (colToJoin != null) {
+                    break;
+                }
+            }
+            if (colToJoin != null) {
+                break;
+            }
+        }
+
+        // Parte del ALÍAS
+
+        // Fin parte Alías
+
+        // Parte del Inner Join
+        SQL.append(" INNER JOIN ");
+        SQL.append(metaData.schema.get(recursiveQueryBodyAtomsHashTable.get(2).get(0).getTableName()) + "." + recursiveQueryBodyAtomsHashTable.get(2).get(1).getTableName());
+        SQL.append(" ON ");
+        for (Atom atomToCheck: recursiveQueryBodyAtomsHashTable.get(2).toArray(Atom[]::new)) {
+            SQL.append(atomToCheck.getTableName() + "." + colToJoin+ "=");
+        }
+        // Remove trailing equal
+        SQL.deleteCharAt(SQL.length() - 1);
+        SQL.append(" UNION ALL ");
+        SQL.append("SELECT ");
+        for (Atom bodyAtomInstance: recursiveQueryBodyAtomsHashTable.get(1)) {
+            for(int i = 0; i < bodyAtomInstance.getAttributesOrLiterals().size(); i++) {
+                if (bodyAtomInstance.getAttributesOrLiterals().get(i).getType().equals(VariableOrLiteral.VARIABLE)) {
+                    ArrayList<String> tableColumns = metaData.columns.get(bodyAtomInstance.getTableName());
+                    String targetColumnName = tableColumns.get(i);
+                    SQL.append(bodyAtomInstance.getTableName()+"."+targetColumnName + ",");
+                    // Save for later use
+                    bodyAtomInstance.getAttributesOrLiterals().get(i).setColumnName(targetColumnName);
+                }
+            }
+        }
+        SQL.deleteCharAt(SQL.length() - 1);
+        // Find possibleJoin
+
+        SQL.append(" FROM " + metaData.schema.get(recursiveQueryBodyAtomsHashTable.get(1).get(0).getTableName()) + "." + recursiveQueryBodyAtomsHashTable.get(1).get(0).getTableName());
+
+        String colToJoin2 = null;
+        for (int i = 0; i < recursiveQueryBodyAtomsHashTable.get(2).size(); i++) {
+            for (int j = i + 1; j < recursiveQueryBodyAtomsHashTable.get(2).size(); j++) {
+                colToJoin2 = recursiveQueryBodyAtomsHashTable.get(2).get(i).canBeJoined(recursiveQueryBodyAtomsHashTable.get(2).get(j));
+                if (colToJoin2 != null) {
+                    break;
+                }
+            }
+            if (colToJoin2 != null) {
+                break;
+            }
+        }
+
+        SQL.append(" INNER JOIN ");
+        SQL.append("dbo." + headAtom.getTableName());
+        SQL.append(" ON ");
+        SQL.append("dbo." + headAtom.getTableName() + "." + colToJoin2);
+        SQL.append(" = ");
+        SQL.append(metaData.schema.get(recursiveQueryBodyAtomsHashTable.get(1).get(0).getTableName()) +
+                        recursiveQueryBodyAtomsHashTable.get(1).get(0).getTableName() + "." + colToJoin2);
+        System.out.println(SQL);
+        // Query Section
+        SQL.append(") SELECT * ");
+        SQL.append(" FROM ");
+        SQL.append(headAtom.getTableName());
+        System.out.println(SQL);
+
+        con.query(SQL.toString());
     }
 }
