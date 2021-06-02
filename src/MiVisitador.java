@@ -58,86 +58,21 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
     List<Atom> ruleBodyAtoms = new ArrayList<>();
 
     List<VariableOrLiteral> ruleHeadAtomLiteralsOrVariables = new ArrayList<>();
-
-
     boolean bodyAtomSemaphore = false;
     boolean executeRuleQuery = false;
     String[] nodeNames = DatalogParser.ruleNames;
 
+    List<Atom> recursiveQueryBodyAtoms = new ArrayList<>();
+    List<VariableOrLiteral> recursiveQueryHeadAtomLiteralsOrVariables = new ArrayList<>();
+    List<VariableOrLiteral> recursiveQueryBodyAtomLiteralsOrVariables = new ArrayList<>();
+    boolean executeRecursiveQuery = false;
+    Atom recursiveQueryHeadAtom;
+    Hashtable<Integer, List<Atom>> recursiveQueryBodyAtomsHashTable
+            = new Hashtable<Integer, List<Atom>>();
+    int atomCount;
     // ☾ Predicate Listener 'Student()'
     @Override public Node visitPredicate(DatalogParser.PredicateContext ctx) {
         return visitChildren(ctx); }
-
-    /*
-    // ✩ Literal Listener '15'
-    @Override public Node visitLiteral(DatalogParser.LiteralContext ctx) {
-        // Prevent variables to be saved in both visitLiteral and visitCondition
-        // That causes duplication of literals
-        // They'll be saved only on visitCondition
-        String parentX2NodeName = nodeNames[ctx.getParent().getParent().getRuleIndex()];
-
-        String parentX3NodeName = nodeNames[ctx.getParent().getParent().getParent().getRuleIndex()];
-
-        if(parentX3NodeName.equals("atom") && !bodyAtomSemaphore) {
-            ruleHeadAtomLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.LITERAL));
-            basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.LITERAL));
-            basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
-            return visitChildren(ctx);
-        }
-        if(parentX3NodeName.equals("atom") && !basicQuerySemaphore ) {
-            basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.LITERAL));
-            basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
-            return visitChildren(ctx);
-        }
-        if (parentX2NodeName.equals("condition")) {
-            return visitChildren(ctx);
-        } else if (parentX2NodeName.equals("atom")) {
-            basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.LITERAL));
-            basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
-            return visitChildren(ctx);
-        } else {
-            basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.LITERAL));
-            basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
-            return visitChildren(ctx);
-        }
-
-    }
-
-    // ✦ Variable Listener '?x'
-    @Override public Node visitVariable(DatalogParser.VariableContext ctx) {
-        // Prevent variables to be saved in both visitVariable and visitCondition
-        // That causes duplication of variables
-        // They'll be saved only on visitCondition
-        String parentX2NodeName = nodeNames[ctx.getParent().getParent().getRuleIndex()];
-
-        String parentX3NodeName = nodeNames[ctx.getParent().getParent().getParent().getRuleIndex()];
-
-        if(parentX3NodeName.equals("atom") && !bodyAtomSemaphore) {
-            ruleHeadAtomLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.VARIABLE));
-            basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.VARIABLE));
-            basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
-            return visitChildren(ctx);
-        }
-        if(parentX3NodeName.equals("atom") && !basicQuerySemaphore ) {
-            basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.VARIABLE));
-            basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
-            return visitChildren(ctx);
-        }
-
-        if (parentX2NodeName.equals("condition")) {
-            return visitChildren(ctx);
-        } else if (parentX2NodeName.equals("atom")) {
-            basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.VARIABLE));
-            basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
-            return visitChildren(ctx);
-        } else {
-            basicQueryLiteralsOrVariables.add(new VariableOrLiteral(ctx.getText(), null, VariableOrLiteral.VARIABLE));
-            basicQueryFullExpresions.put(basicQueryIndex, basicQueryLiteralsOrVariables);
-            return visitChildren(ctx);
-        }
-    }
-     */
-
 
     // ❂ End Listener '.'
     @Override public Node visitEnd(DatalogParser.EndContext ctx) {
@@ -145,7 +80,6 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
             DBConnector.query(basicQueryPredicates.get(basicQueryIndex-1),
                     basicQueryFullExpresions.get(basicQueryIndex).toArray(VariableOrLiteral[]::new),
                     basicQueryConditions.toArray(Condition[]::new));
-
         }
         if(executeRuleQuery){
             // Inserting the ruleQuery in the Database.
@@ -153,14 +87,11 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
             executeRuleQuery = false;
         }
 
-
         basicQueryLiteralsOrVariables.clear();
         basicQueryConditions.clear();
 
         return visitChildren(ctx); }
-
     // ✮ Query Listener '?-'
-
     @Override public Node visitQuery(DatalogParser.QueryContext ctx) {
         DBConnector.retrieveMetaData();
         basicQuerySemaphore = true;
@@ -207,6 +138,38 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
             }
             basicQueryPredicates.add(basicQueryPredicate);
             basicQueryFullExpresions.put(basicQueryIndex,  basicQueryLiteralsOrVariables);
+        }else if(atomCount==1 && executeRecursiveQuery ){
+            // Fill Base Case
+            if(!bodyAtomSemaphore) {
+                String recursiveQueryHeadAtomPredicate = ctx.getChild(0).getText();
+                String[] recursiveQueryHeadAtomVariablesOrLiterals = ctx.getChild(2).getText().split(",");
+                for (int i = 0; i < recursiveQueryHeadAtomVariablesOrLiterals.length; i++) {
+                    System.out.println(recursiveQueryHeadAtomVariablesOrLiterals[i].charAt(0));
+                    if (recursiveQueryHeadAtomVariablesOrLiterals[i].charAt(0) == '?') {
+                        recursiveQueryHeadAtomLiteralsOrVariables.add(new VariableOrLiteral(recursiveQueryHeadAtomVariablesOrLiterals[i], null, VariableOrLiteral.VARIABLE));
+                    } else {
+                        recursiveQueryHeadAtomLiteralsOrVariables.add(new VariableOrLiteral(recursiveQueryHeadAtomVariablesOrLiterals[i], null, VariableOrLiteral.LITERAL));
+                    }
+                }
+                recursiveQueryHeadAtom = new Atom(recursiveQueryHeadAtomPredicate, recursiveQueryHeadAtomLiteralsOrVariables);
+            }else{
+                String recursiveQueryBodyAtomPredicate = ctx.getChild(0).getText();
+                String[] recursiveQueryBodyAtomVariablesOrLiterals = ctx.getChild(2).getText().split(",");
+                for (int i = 0; i < recursiveQueryBodyAtomVariablesOrLiterals.length; i++) {
+                    System.out.println(recursiveQueryBodyAtomVariablesOrLiterals[i].charAt(0));
+                    if (recursiveQueryBodyAtomVariablesOrLiterals[i].charAt(0) == '?') {
+                        recursiveQueryBodyAtomLiteralsOrVariables.add(new VariableOrLiteral(recursiveQueryBodyAtomVariablesOrLiterals[i], null, VariableOrLiteral.VARIABLE));
+                    } else {
+                        recursiveQueryBodyAtomLiteralsOrVariables.add(new VariableOrLiteral(recursiveQueryBodyAtomVariablesOrLiterals[i], null, VariableOrLiteral.LITERAL));
+                    }
+                }
+                Atom recursiveQueryBodyAtom = new Atom(recursiveQueryBodyAtomPredicate, recursiveQueryBodyAtomLiteralsOrVariables);
+                recursiveQueryBodyAtoms.add(recursiveQueryBodyAtom);
+                recursiveQueryBodyAtomsHashTable.put(atomCount,  recursiveQueryBodyAtoms);
+            }
+        }else if(atomCount>1 && executeRecursiveQuery ) {
+            // Fill Recursive Case
+
         }
         return visitChildren(ctx);
     }
@@ -215,15 +178,20 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         bodyAtomSemaphore = true;
         return visitChildren(ctx);
     }
-
     //  «» Programa Inicio
     @Override public Node visitProgram(DatalogParser.ProgramContext ctx) {
         DBConnector.retrieveMetaData();
         return visitChildren(ctx); }
 
     @Override public Node visitRules(DatalogParser.RulesContext ctx) {
-        executeRuleQuery = true;
+        atomCount++;
+        if(ctx.getChild(1) != null){
+            executeRecursiveQuery = true;
+        }else{
+            executeRuleQuery = true;
+        }
         return visitChildren(ctx);
+
     }
 }
 
