@@ -42,7 +42,7 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
      */
 
     List<VariableOrLiteral> basicQueryLiteralsOrVariables =new ArrayList<VariableOrLiteral>();
-
+    List<VariableOrLiteral> ruleBodyAtomLiteralsOrVariables = new ArrayList<>();
     List<Condition> basicQueryConditions = new ArrayList<Condition>();
 
     boolean basicQuerySemaphore = false;
@@ -62,13 +62,14 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
     boolean executeRuleQuery = false;
     String[] nodeNames = DatalogParser.ruleNames;
 
-    List<Atom> recursiveQueryBodyAtoms = new ArrayList<>();
+
 
     boolean executeRecursiveQuery = false;
     Atom recursiveQueryHeadAtom;
     Hashtable<Integer, List<Atom>> recursiveQueryBodyAtomsHashTable
             = new Hashtable<Integer, List<Atom>>();
     int atomCount;
+    List<Atom> recursiveQueryBodyAtoms = new ArrayList<>();
     // ☾ Predicate Listener 'Student()'
     @Override public Node visitPredicate(DatalogParser.PredicateContext ctx) {
         return visitChildren(ctx); }
@@ -93,7 +94,7 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
     // ✮ Query Listener '?-'
     @Override public Node visitQuery(DatalogParser.QueryContext ctx) {
         if(executeRecursiveQuery ){
-            DBConnector.recursiveQuery(recursiveQueryBodyAtomsHashTable);
+            DBConnector.recursiveQuery(recursiveQueryBodyAtomsHashTable, recursiveQueryHeadAtom);
         }
         DBConnector.retrieveMetaData();
         basicQuerySemaphore = true;
@@ -109,7 +110,8 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
 
     // *$* Atom Listener
     @Override public Node visitAtom(DatalogParser.AtomContext ctx) {
-        List<VariableOrLiteral> ruleBodyAtomLiteralsOrVariables = new ArrayList<>();
+        List<Atom> temporal = recursiveQueryBodyAtoms;
+        ruleBodyAtomLiteralsOrVariables.clear();
         String parentX1NodeName = nodeNames[ctx.getParent().getRuleIndex()];
         if (parentX1NodeName.equals("atoms") && !executeRecursiveQuery) {
             // BodyAtoms Case
@@ -124,7 +126,7 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
                 }
             }
             ruleBodyAtoms.add(new Atom(ruleBodyColumnName, ruleBodyAtomLiteralsOrVariables));
-        }else if(parentX1NodeName.equals("rule")){
+        }else if(parentX1NodeName.equals("rule") && !executeRecursiveQuery){
             // HeadAtom Case
             ruleHeadAtom = new Atom(ctx.getChild(0).getText(), ruleHeadAtomLiteralsOrVariables);
         }else if(basicQuerySemaphore){
@@ -155,6 +157,7 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
                     }
                 }
                 recursiveQueryHeadAtom = new Atom(recursiveQueryHeadAtomPredicate, recursiveQueryHeadAtomLiteralsOrVariables);
+
             }else{
                 List<VariableOrLiteral> recursiveQueryBodyAtomLiteralsOrVariables = new ArrayList<>();
                 System.out.println("Entering");
@@ -170,8 +173,11 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
                 }
                 Atom recursiveQueryBodyAtom = new Atom(recursiveQueryBodyAtomPredicate, recursiveQueryBodyAtomLiteralsOrVariables);
                 recursiveQueryBodyAtoms.add(recursiveQueryBodyAtom);
-
-                recursiveQueryBodyAtomsHashTable.put(atomCount,  recursiveQueryBodyAtoms);
+                System.out.println(recursiveQueryBodyAtoms.toString());
+                if(!recursiveQueryBodyAtomsHashTable.containsKey(atomCount)){
+                    recursiveQueryBodyAtomsHashTable.put(atomCount,  new ArrayList<Atom>());
+                }
+                recursiveQueryBodyAtomsHashTable.get(atomCount).add(recursiveQueryBodyAtom);
             }
         }else {}
         return visitChildren(ctx);
@@ -197,6 +203,7 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
     }
     @Override public Node visitRule(DatalogParser.RuleContext ctx) {
         atomCount++;
+        bodyAtomSemaphore = false;
         return visitChildren(ctx); }
 }
 

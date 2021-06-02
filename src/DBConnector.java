@@ -220,7 +220,9 @@ public class DBConnector {
 
     }
 
-    public static void recursiveQuery(Hashtable<Integer, List<Atom>> recursiveQueryBodyAtomsHashTable){
+    public static void recursiveQuery(Hashtable<Integer, List<Atom>> recursiveQueryBodyAtomsHashTable, Atom headAtom){
+
+
         for(int i = 1; i <= recursiveQueryBodyAtomsHashTable.size(); i++){
             System.out.println("\n");
             List<Atom> temporal = recursiveQueryBodyAtomsHashTable.get(i);
@@ -229,5 +231,7 @@ public class DBConnector {
                 System.out.println("\n");
             }
         }
+
+        System.out.println("\n" + headAtom.toString());
     }
 }
