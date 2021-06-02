@@ -6,6 +6,7 @@ import Pojos.VariableOrLiteral;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
 
 public class DBConnector {
@@ -219,7 +220,14 @@ public class DBConnector {
 
     }
 
-    public static void recursiveQuery(){
-
+    public static void recursiveQuery(Hashtable<Integer, List<Atom>> recursiveQueryBodyAtomsHashTable){
+        for(int i = 1; i <= recursiveQueryBodyAtomsHashTable.size(); i++){
+            System.out.println("\n");
+            List<Atom> temporal = recursiveQueryBodyAtomsHashTable.get(i);
+            for (int j = 0; j < temporal.size(); j++) {
+                System.out.println("Nivel: " + i + temporal.get(j).toString());
+                System.out.println("\n");
+            }
+        }
     }
 }

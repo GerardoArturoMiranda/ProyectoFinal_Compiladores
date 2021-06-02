@@ -63,8 +63,7 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
     String[] nodeNames = DatalogParser.ruleNames;
 
     List<Atom> recursiveQueryBodyAtoms = new ArrayList<>();
-    List<VariableOrLiteral> recursiveQueryHeadAtomLiteralsOrVariables = new ArrayList<>();
-    List<VariableOrLiteral> recursiveQueryBodyAtomLiteralsOrVariables = new ArrayList<>();
+
     boolean executeRecursiveQuery = false;
     Atom recursiveQueryHeadAtom;
     Hashtable<Integer, List<Atom>> recursiveQueryBodyAtomsHashTable
@@ -81,7 +80,7 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
                     basicQueryFullExpresions.get(basicQueryIndex).toArray(VariableOrLiteral[]::new),
                     basicQueryConditions.toArray(Condition[]::new));
         }
-        if(executeRuleQuery){
+        if(executeRuleQuery && !executeRecursiveQuery){
             // Inserting the ruleQuery in the Database.
             DBConnector.ruleQuery(ruleHeadAtom, ruleBodyAtoms.toArray(Atom[]::new));
             executeRuleQuery = false;
@@ -93,6 +92,9 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         return visitChildren(ctx); }
     // ✮ Query Listener '?-'
     @Override public Node visitQuery(DatalogParser.QueryContext ctx) {
+        if(executeRecursiveQuery ){
+            DBConnector.recursiveQuery(recursiveQueryBodyAtomsHashTable);
+        }
         DBConnector.retrieveMetaData();
         basicQuerySemaphore = true;
         basicQueryIndex++;
@@ -109,7 +111,7 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
     @Override public Node visitAtom(DatalogParser.AtomContext ctx) {
         List<VariableOrLiteral> ruleBodyAtomLiteralsOrVariables = new ArrayList<>();
         String parentX1NodeName = nodeNames[ctx.getParent().getRuleIndex()];
-        if (parentX1NodeName.equals("atoms")) {
+        if (parentX1NodeName.equals("atoms") && !executeRecursiveQuery) {
             // BodyAtoms Case
             String ruleBodyColumnName = ctx.getChild(0).getText();
             String[] ruleBodyVariablesOrLiterals = ctx.getChild(2).getText().split(",");
@@ -138,9 +140,10 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
             }
             basicQueryPredicates.add(basicQueryPredicate);
             basicQueryFullExpresions.put(basicQueryIndex,  basicQueryLiteralsOrVariables);
-        }else if(atomCount==1 && executeRecursiveQuery ){
+        }else if(atomCount>0 && executeRecursiveQuery ){
             // Fill Base Case
             if(!bodyAtomSemaphore) {
+                List<VariableOrLiteral> recursiveQueryHeadAtomLiteralsOrVariables = new ArrayList<>();
                 String recursiveQueryHeadAtomPredicate = ctx.getChild(0).getText();
                 String[] recursiveQueryHeadAtomVariablesOrLiterals = ctx.getChild(2).getText().split(",");
                 for (int i = 0; i < recursiveQueryHeadAtomVariablesOrLiterals.length; i++) {
@@ -153,6 +156,8 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
                 }
                 recursiveQueryHeadAtom = new Atom(recursiveQueryHeadAtomPredicate, recursiveQueryHeadAtomLiteralsOrVariables);
             }else{
+                List<VariableOrLiteral> recursiveQueryBodyAtomLiteralsOrVariables = new ArrayList<>();
+                System.out.println("Entering");
                 String recursiveQueryBodyAtomPredicate = ctx.getChild(0).getText();
                 String[] recursiveQueryBodyAtomVariablesOrLiterals = ctx.getChild(2).getText().split(",");
                 for (int i = 0; i < recursiveQueryBodyAtomVariablesOrLiterals.length; i++) {
@@ -165,12 +170,10 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
                 }
                 Atom recursiveQueryBodyAtom = new Atom(recursiveQueryBodyAtomPredicate, recursiveQueryBodyAtomLiteralsOrVariables);
                 recursiveQueryBodyAtoms.add(recursiveQueryBodyAtom);
+
                 recursiveQueryBodyAtomsHashTable.put(atomCount,  recursiveQueryBodyAtoms);
             }
-        }else if(atomCount>1 && executeRecursiveQuery ) {
-            // Fill Recursive Case
-
-        }
+        }else {}
         return visitChildren(ctx);
     }
 
@@ -184,7 +187,6 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         return visitChildren(ctx); }
 
     @Override public Node visitRules(DatalogParser.RulesContext ctx) {
-        atomCount++;
         if(ctx.getChild(1) != null){
             executeRecursiveQuery = true;
         }else{
@@ -193,5 +195,8 @@ public class MiVisitador extends DatalogBaseVisitor<Node>{
         return visitChildren(ctx);
 
     }
+    @Override public Node visitRule(DatalogParser.RuleContext ctx) {
+        atomCount++;
+        return visitChildren(ctx); }
 }
 
